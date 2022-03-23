@@ -11,10 +11,10 @@ class NFL:
         soup = BeautifulSoup(response.text, features='lxml')
 
         for item in soup.find_all(attrs={'data-stat': 'team_name', 'class':'left'})[1:33]:
-                self.teams[item.find('a')['href'].split('/')[-2]] = {
-                    "team_name": item.text,
-                    "url": self.url + item.find('a')['href'],
-                } 
+            self.teams[item.find('a')['href'].split('/')[-2]] = {
+                "team_name": item.text,
+                "url": self.url + item.find('a')['href'],
+            } 
 
     def franchise_codes(self):
         '''
