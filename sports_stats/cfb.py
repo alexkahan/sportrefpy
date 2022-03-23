@@ -10,7 +10,7 @@ class CFB:
         response = requests.get(self.url + '/schools')
         soup = BeautifulSoup(response.text, features='lxml')
 
-        for item in soup.find_all(attrs={'data-stat': 'school_name'})[1:2]:
+        for item in soup.find_all(attrs={'data-stat': 'school_name'})[1:486]:
             if item.find('a') is not None:
                 self.schools[item.find('a')['href'].split('/')[-2]] = {
                 "team_name": item.text,
