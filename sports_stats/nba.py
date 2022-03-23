@@ -2,9 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 
 class NBA:   
-    '''
-    Initializes a dictionary of 
-    '''
 
     def __init__(self):
         self.url = 'https://www.basketball-reference.com'
@@ -17,7 +14,7 @@ class NBA:
             self.teams[item.find('a')['href'].split('/')[-2]] = {
                 "team_name": item.text,
                 "url": self.url + item.find('a')['href'],
-                }
+            }
 
     def franchise_codes(self):
         '''

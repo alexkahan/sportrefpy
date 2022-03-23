@@ -2,9 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 
 class NFL:   
-    '''
-    Initializes a dictionary of 
-    '''
 
     def __init__(self):
         self.url = 'https://www.pro-football-reference.com'
