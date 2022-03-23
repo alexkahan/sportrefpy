@@ -48,7 +48,6 @@ class NBAFranchise(NBA):
         return f"<{self.abbreviation} - {self.franchise}>"
 
 
-# nba = NBA()
 sixers = NBAFranchise('PHI')
 sixers.players_all_time()
 print(sixers.url)
