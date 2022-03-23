@@ -1,5 +1,5 @@
 import pytest
-from sports_stats.nba.nba import NBAFranchise
+from sports_stats.nba.team import NBAFranchise
 
 
 def test_NBA_coach_playoffs():

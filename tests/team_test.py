@@ -1,8 +1,12 @@
 import pytest
-from sports_stats.nba.nba import NBA, NBAFranchise
-from sports_stats.nhl.nhl import NHL, NHLFranchise
-from sports_stats.nfl.nfl import NFL, NFLFranchise
-from sports_stats.mlb.mlb import MLB, MLBFranchise
+from sports_stats.nba.team import NBAFranchise
+from sports_stats.nba.league import NBA
+from sports_stats.nhl.team import NHLFranchise
+from sports_stats.nhl.league import NHL
+from sports_stats.nfl.team import NFLFranchise
+from sports_stats.nfl.league import NFL
+from sports_stats.mlb.league import MLB
+from sports_stats.mlb.team import MLBFranchise
 from sports_stats.cbb.cbb import CBB, CBBSchool
 from sports_stats.cfb.cfb import CFB, CFBSchool
 
