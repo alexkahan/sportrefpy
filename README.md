@@ -1,2 +1,2 @@
 # sports_stats
-Pulling sports data from the Sports-Reference family of sites
+Pulling sports data from the [Sports-Reference](https://www.sports-reference.com/) family of sites.
