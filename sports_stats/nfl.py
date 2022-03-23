@@ -29,7 +29,7 @@ class NFLFranchise(NFL):
         super().__init__()
         self.abbreviation = franchise.upper()
         self.franchise = self.teams[franchise]['team_name']
-        self.url = self.teams[franchise]['url']
+        self.team_url = self.teams[franchise]['url']
 
     def __repr__(self):
         return f"<{self.abbreviation} - {self.franchise}>"

@@ -10,11 +10,11 @@ class CFB:
         response = requests.get(self.url + '/schools')
         soup = BeautifulSoup(response.text, features='lxml')
 
-        for item in soup.find_all(attrs={'data-stat': 'school_name'})[1:322]:
+        for item in soup.find_all(attrs={'data-stat': 'school_name'})[1:2]:
             if item.find('a') is not None:
                 self.schools[item.find('a')['href'].split('/')[-2]] = {
                 "team_name": item.text,
-                "url": self.url + item.find('a')['href'],
+                "url": 'https://www.sports-reference.com' + item.find('a')['href'],
                 } 
 
     def school_codes(self):
@@ -30,7 +30,7 @@ class CFBSchool(CFB):
         super().__init__()
         self.abbreviation = school
         self.school = self.schools[school]['team_name']
-        self.url = self.schools[school]['url']
+        self.school_url = self.schools[school]['url']
 
     def __repr__(self):
         return f"<{self.abbreviation} - {self.school}>"
