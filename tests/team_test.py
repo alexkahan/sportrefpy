@@ -55,6 +55,6 @@ def test_CFB():
     cfb = CFB()
     assert len(cfb.schools) == 298
 
-def test_CBB_school():
+def test_CFB_school():
     wake = CFBSchool('wake-forest')
     assert wake.school == "Wake Forest"
