@@ -32,6 +32,11 @@ def test_NFL_franchise():
     kc = NFLFranchise('kan')
     assert kc.franchise == "Kansas City Chiefs"
 
+def test_NFL_seasons():
+    eagles = NFLFranchise('PHI')
+    seasons = eagles.season_history()
+    assert seasons.loc[2017, 'Playoffs'] == 'Won SB'
+
 
 def test_MLB_franchise():
     dodgers = MLBFranchise('LAD')
