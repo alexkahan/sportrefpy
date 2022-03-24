@@ -10,6 +10,7 @@ class NBAFranchise(NBA):
         self.players_url = self.team_url + 'players.html'
         self.coaches_url = self.team_url + 'coaches.html'
         self.current_roster_url = f'{self.url}/contracts/{self.abbreviation}.html'
+        self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
 
     
     def players_all_time_stats(self):
@@ -57,11 +58,26 @@ class NBAFranchise(NBA):
         current_roster = pd.read_html(self.current_roster_url)[0]
         current_roster = current_roster[current_roster.columns[:2]]
         current_roster.columns = ['Player', 'Age']
-        current_roster = current_roster[current_roster['Player'] != 'Team Totals']
+        current_roster = current_roster[current_roster['Player']\
+             != 'Team Totals']
         current_roster.set_index('Player', inplace=True)
         current_roster['Age'] = current_roster['Age'].apply(lambda x: int(x))
 
         return current_roster
+
+    
+    def season_history(self):
+        '''
+        Returns Pandas dataframe of seasons.
+        '''
+
+        seasons = pd.read_html(self.seasons_url)[0]
+        seasons = seasons[seasons['Team'] != 'Team']
+        seasons.set_index('Season', inplace=True)
+        seasons.drop(columns={'Team', 'Unnamed: 8', 'Unnamed: 15'}, 
+                    inplace=True)
+
+        return seasons
         
 
     def __repr__(self):
