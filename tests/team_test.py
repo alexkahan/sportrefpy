@@ -12,9 +12,20 @@ def test_NBA_franchise():
     assert sixers.franchise == "Philadelphia 76ers"
 
 
+def test_NBA_seasons():
+    celtics = NBAFranchise('BOS')
+    seasons = celtics.season_history()
+    assert seasons.loc['2011-12', 'DRtg'] == 98.2
+
+
 def test_NHL_franchise():
     golden_knights = NHLFranchise('VEG')
     assert golden_knights.franchise == "Vegas Golden Knights"
+
+def test_NHL_seasons():
+    buffalo = NHLFranchise('BUF')
+    seasons = buffalo.season_history()
+    assert seasons.loc['1999-00', 'Finish'] == '3rd of 5'
 
 
 def test_NFL_franchise():
