@@ -42,6 +42,11 @@ def test_MLB_franchise():
     dodgers = MLBFranchise('LAD')
     assert dodgers.franchise == "Los Angeles Dodgers"
 
+def test_MLB_seasons():
+    nyy = MLBFranchise('NYY')
+    seasons = nyy.season_history()
+    assert seasons.loc[1921, 'Playoffs'] == 'Lost WS (5-3)'
+
 
 def test_CBB_school():
     af = CBBSchool('air-force')

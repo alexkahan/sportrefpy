@@ -1,6 +1,7 @@
 import pytest
 from sports_stats.nba.team import NBAFranchise
 from sports_stats.nhl.team import NHLFranchise
+from sports_stats.mlb.team import MLBFranchise
 
 def test_NBA_player_FGA():
     sixers = NBAFranchise('PHI')
@@ -28,8 +29,18 @@ def test_NHL_skaters():
     skaters = veg.skaters_all_time_stats()
     assert skaters.loc['Pierre-Edouard Bellemare', 'PPG'] == 0.0
 
-
 def test_NHL_player():
     panthers = NHLFranchise('FLA')
     players = panthers.current_roster()
     assert 'Aleksander Barkov' in players.index
+
+
+def test_MLB_batter():
+    sea = MLBFranchise('SEA')
+    batters = sea.batters_all_time_stats()
+    assert batters.loc['Ken Griffey Jr.', 'PA'] == 7250.0
+
+def test_MLB_pitcher():
+    bos = MLBFranchise('BOS')
+    pitchers = bos.pitchers_all_time_stats()
+    assert pitchers.loc['Dennis Eckersley', 'To'] == 1998

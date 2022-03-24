@@ -2,6 +2,7 @@ import pytest
 from sports_stats.nba.team import NBAFranchise
 from sports_stats.nhl.team import NHLFranchise
 from sports_stats.nfl.team import NFLFranchise
+from sports_stats.mlb.team import MLBFranchise
 
 
 def test_NBA_coach_playoffs():
@@ -25,3 +26,9 @@ def test_NFL_coach():
     eagles = NFLFranchise('PHI')
     coaches = eagles.coaches_all_time_data()
     assert coaches.loc['Dick Vermeil', 'W-L%'] == 0.535
+
+
+def test_MLB_manager():
+    nym = MLBFranchise('NYM')
+    managers = nym.managers_all_time_data()
+    assert managers.loc['Gil Hodges', 'BestFin'] == 1
