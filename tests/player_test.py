@@ -1,5 +1,6 @@
 import pytest
 from sports_stats.nba.team import NBAFranchise
+from sports_stats.nba.player import NBAPlayer
 from sports_stats.nhl.team import NHLFranchise
 from sports_stats.mlb.team import MLBFranchise
 
@@ -17,6 +18,18 @@ def test_NBA_player():
     clippers = NBAFranchise('LAC')
     players = clippers.current_roster()
     assert 'Kawhi Leonard' in players.index
+
+def test_NBA_player_regular_season_stats():
+    the_answer = NBAPlayer('Allen Iverson')
+    assert the_answer.regular_season_stats().loc['Career', 'PTS'] == 24368.0
+
+def test_NBA_player_post_season_stats_false():
+    fo = NBAPlayer('Frank Oleynick')
+    assert fo.playoffs is False and fo.postseason_season_stats() is None
+
+def test_NBA_player_post_season_stats_true():
+    sheed = NBAPlayer('Rasheed Wallace')
+    assert sheed.postseason_season_stats().loc['2009-10', 'PTS'] == 147.0
 
 
 def test_NHL_goalie():

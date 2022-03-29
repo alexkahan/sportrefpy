@@ -11,7 +11,6 @@ def test_NBA_franchise():
     sixers = NBAFranchise('PHI')
     assert sixers.franchise == "Philadelphia 76ers"
 
-
 def test_NBA_seasons():
     celtics = NBAFranchise('BOS')
     seasons = celtics.season_history()

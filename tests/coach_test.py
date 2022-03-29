@@ -15,6 +15,11 @@ def test_NBA_coach_winloss():
     coaches = warriors.coaches_all_time_data()
     assert coaches.loc['Don Nelson', 'W/L%'] == 0.488
 
+def test_nba_coach_exists():
+    heat = NBAFranchise('MIA')
+    coaches = heat.coaches_all_time_data()
+    with pytest.raises(KeyError): 
+        coaches.loc['Pat Spoelstra']
 
 def test_NHL_coach():
     flyers = NHLFranchise('PHI')
