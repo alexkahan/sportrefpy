@@ -13,9 +13,9 @@ class NBAFranchise(NBA):
         self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
 
     
-    def players_all_time_stats(self):
+    def players_all_time_stats(self, player=None):
         '''
-        Returns Pandas dataframe of all historical player data.
+        Returns Pandas dataframe of all historical player data for that team.
         '''
 
         players = pd.read_html(self.players_url)[0]
@@ -29,10 +29,16 @@ class NBAFranchise(NBA):
         players.set_index('Player', inplace=True)
         players = players.apply(pd.to_numeric)
 
+        if player is not None:
+            try:
+                return players.loc[player]
+            except KeyError:
+                return 'Player not found.'
+
         return players
 
 
-    def coaches_all_time_data(self):
+    def coaches_all_time_data(self, coach=None):
         '''
         Returns Pandas dataframe of all historical coach data.
         '''
@@ -46,6 +52,12 @@ class NBAFranchise(NBA):
         coaches = coaches[coaches['Coach'] != 'Coach']
         coaches.set_index('Coach', inplace=True)
         coaches = coaches.apply(pd.to_numeric)
+
+        if coach is not None:
+            try:
+                return coaches.loc[coach]
+            except KeyError:
+                return 'Coach not found.'
 
         return coaches
 
@@ -66,7 +78,7 @@ class NBAFranchise(NBA):
         return current_roster
 
     
-    def season_history(self):
+    def season_history(self, year=None):
         '''
         Returns Pandas dataframe of seasons.
         '''
@@ -74,8 +86,15 @@ class NBAFranchise(NBA):
         seasons = pd.read_html(self.seasons_url)[0]
         seasons = seasons[seasons['Team'] != 'Team']
         seasons.set_index('Season', inplace=True)
-        seasons.drop(columns={'Team', 'Unnamed: 8', 'Unnamed: 15'}, 
+        seasons['Team'] = seasons['Team'].apply(lambda x: x.split('*')[0])
+        seasons.drop(columns={'Unnamed: 8', 'Unnamed: 15'}, 
                     inplace=True)
+
+        if year is not None:
+            try:
+                return seasons.loc[year]
+            except KeyError:
+                return 'Season not found.'
 
         return seasons
         
