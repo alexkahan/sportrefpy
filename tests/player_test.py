@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 from sports_stats.nba.team import NBAFranchise
 from sports_stats.nba.player import NBAPlayer
 from sports_stats.nhl.team import NHLFranchise
@@ -16,20 +17,30 @@ def test_NBA_player_TRB():
 
 def test_NBA_player():
     clippers = NBAFranchise('LAC')
-    players = clippers.current_roster()
+    players = clippers.roster(2022)
     assert 'Kawhi Leonard' in players.index
 
 def test_NBA_player_regular_season_stats():
     the_answer = NBAPlayer('Allen Iverson')
-    assert the_answer.regular_season_stats().loc['Career', 'PTS'] == 24368.0
+    assert the_answer.regular_season_stats().loc['1997-98', 'PTS'] == 1758.0
 
 def test_NBA_player_post_season_stats_false():
     fo = NBAPlayer('Frank Oleynick')
-    assert fo.playoffs is False and fo.postseason_season_stats() is None
+    assert fo.playoffs is False and fo.post_season_season_stats() is None
 
 def test_NBA_player_post_season_stats_true():
     sheed = NBAPlayer('Rasheed Wallace')
-    assert sheed.postseason_season_stats().loc['2009-10', 'PTS'] == 147.0
+    assert sheed.post_season_season_stats().loc['2009-10', 'PTS'] == 147.0
+
+def test_NBA_player_reg_season_game_log():
+    kg = NBAPlayer('Kevin Garnett')
+    gl = kg.reg_season_game_log('1999-00')
+    assert gl.loc[2, 'FG'] == 13.0
+
+def test_NBA_player_post_season_game_log():
+    dametime = NBAPlayer('Damian Lillard')
+    gl = dametime.post_season_game_log()
+    assert np.isnan(gl.loc[56, 'FG'])
 
 
 def test_NHL_goalie():

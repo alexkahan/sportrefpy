@@ -9,7 +9,7 @@ from sports_stats.cfb.cfb import CFBSchool
 
 def test_NBA_franchise():
     sixers = NBAFranchise('PHI')
-    assert sixers.franchise == "Philadelphia 76ers"
+    assert sixers.franchise_name == "Philadelphia 76ers"
 
 def test_NBA_seasons():
     celtics = NBAFranchise('BOS')
