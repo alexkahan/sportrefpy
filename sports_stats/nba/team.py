@@ -1,15 +1,17 @@
 import pandas as pd
+from bs4 import BeautifulSoup
+import requests
 from sports_stats.nba.league import NBA
+
 
 class NBAFranchise(NBA):
     def __init__(self, franchise):
         super().__init__()
         self.abbreviation = franchise
-        self.franchise = self.teams[franchise]['team_name']
+        self.franchise_name = self.teams[franchise]['team_name']
         self.team_url = self.teams[franchise]['url']
         self.players_url = self.team_url + 'players.html'
         self.coaches_url = self.team_url + 'coaches.html'
-        self.current_roster_url = f'{self.url}/contracts/{self.abbreviation}.html'
         self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
 
     
@@ -62,20 +64,29 @@ class NBAFranchise(NBA):
         return coaches
 
 
-    def current_roster(self):
+    def roster(self, season=None):
         '''
         Returns Pandas dataframe of current roster.
         '''
-
-        current_roster = pd.read_html(self.current_roster_url)[0]
-        current_roster = current_roster[current_roster.columns[:2]]
-        current_roster.columns = ['Player', 'Age']
-        current_roster = current_roster[current_roster['Player']\
-             != 'Team Totals']
-        current_roster.set_index('Player', inplace=True)
-        current_roster['Age'] = current_roster['Age'].apply(lambda x: int(x))
-
-        return current_roster
+        if season:
+            response = requests.get(self.team_url)
+            soup = BeautifulSoup(response.text, features='lxml')
+            for i in soup.find_all('th', attrs={'class': 'left'}):
+                if str(season) in i.find('a')['href']:
+                    current_roster = pd.read_html(self.url + i.find('a')['href'])[0]
+                    break
+            current_roster.drop(columns={'Unnamed: 6'}, inplace=True)
+            current_roster['Exp'] = current_roster['Exp'].replace('R', 0)
+            current_roster['Player'] = current_roster['Player'].apply(lambda \
+                x: x.split(' (TW)')[0])
+            current_roster.set_index('Player', inplace=True)
+            current_roster['Exp'] = current_roster['Exp'].apply(lambda x:\
+                 int(x))
+            current_roster['Birth Date'] = current_roster['Birth Date'].apply(\
+                lambda x: pd.to_datetime(x))
+            return current_roster
+        else:
+            return None
 
     
     def season_history(self, year=None):
@@ -100,4 +111,4 @@ class NBAFranchise(NBA):
         
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise}>"
+        return f"<{self.abbreviation} - {self.franchise_name}>"
