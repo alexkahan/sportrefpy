@@ -1,9 +1,11 @@
-from pyparsing import col
 import requests
+
 from bs4 import BeautifulSoup
-from sports_stats.nba.league import NBA
 import pandas as pd
 import numpy as np
+
+from sports_stats.nba.league import NBA
+from sports_stats.errors.not_found import PlayerNotFound
 
 
 class NBAPlayer(NBA):
@@ -27,6 +29,8 @@ class NBAPlayer(NBA):
                         self.playoff_url = self.game_log_url.replace('gamelog', 'gamelog-playoffs')
                     else:
                         self.playoffs = False
+        else:
+            raise PlayerNotFound(f'{player} not found. Please check the capitalization and/or the spelling.')
 
     def regular_season_stats(self):
         '''
@@ -48,7 +52,7 @@ class NBAPlayer(NBA):
         return stats
 
     
-    def post_season_season_stats(self):
+    def post_season_stats(self):
         '''
         Returns a players postseason seasons stats (if applicable) 
         by season or by career.
@@ -125,7 +129,7 @@ class NBAPlayer(NBA):
 
         reg = self.regular_season_stats()
         reg.reset_index(inplace=True)
-        post = self.post_season_season_stats()
+        post = self.post_season_stats()
         post.reset_index(inplace=True)
         career = reg.merge(post, how='outer')
         career = career[['G', 'GS', 'MP', 'FG', 'FGA', '3P', '3PA', '2P',\
