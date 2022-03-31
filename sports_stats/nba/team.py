@@ -7,9 +7,10 @@ from sports_stats.nba.league import NBA
 class NBAFranchise(NBA):
     def __init__(self, franchise):
         super().__init__()
-        self.abbreviation = franchise
-        self.franchise_name = self.teams[franchise]['team_name']
-        self.team_url = self.teams[franchise]['url']
+        self.franchise = franchise.upper()
+        self.abbreviation = self.teams[self.franchise]['abbrev']
+        self.franchise_name = self.teams[self.franchise]['team_name']
+        self.team_url = self.teams[self.franchise]['url']
         self.players_url = self.team_url + 'players.html'
         self.coaches_url = self.team_url + 'coaches.html'
         self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
