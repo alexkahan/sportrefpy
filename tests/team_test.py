@@ -8,11 +8,11 @@ from sports_stats.cfb.cfb import CFBSchool
 
 
 def test_NBA_franchise():
-    sixers = NBAFranchise('PHI')
+    sixers = NBAFranchise('PhI')
     assert sixers.franchise_name == "Philadelphia 76ers"
 
 def test_NBA_seasons():
-    celtics = NBAFranchise('BOS')
+    celtics = NBAFranchise('boS')
     seasons = celtics.season_history()
     assert seasons.loc['2011-12', 'DRtg'] == 98.2
 

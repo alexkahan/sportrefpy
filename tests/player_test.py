@@ -26,11 +26,11 @@ def test_NBA_player_regular_season_stats():
 
 def test_NBA_player_post_season_stats_false():
     fo = NBAPlayer('Frank Oleynick')
-    assert fo.playoffs is False and fo.post_season_season_stats() is None
+    assert fo.playoffs is False and fo.post_season_stats() is None
 
 def test_NBA_player_post_season_stats_true():
     sheed = NBAPlayer('Rasheed Wallace')
-    assert sheed.post_season_season_stats().loc['2009-10', 'PTS'] == 147.0
+    assert sheed.post_season_stats().loc['2009-10', 'PTS'] == 147.0
 
 def test_NBA_player_reg_season_game_log():
     kg = NBAPlayer('Kevin Garnett')
