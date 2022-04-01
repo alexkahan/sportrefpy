@@ -6,6 +6,7 @@ import numpy as np
 import enchant
 
 from sports_stats.nba.league import NBA
+from sports_stats.nba.helpers import spellcheck
 from sports_stats.errors.not_found import PlayerNotFound
 
 
@@ -13,6 +14,7 @@ class NBAPlayer(NBA):
     def __init__(self, player):
         super().__init__()
         
+        spellcheck()
         self.player_dict = enchant.PyPWL('sports_stats/assets/nba_players.txt')
         first_letter = player.split()[-1][0].lower()
         players = pd.read_html(self.url + f'/players/{first_letter}')[0]

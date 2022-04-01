@@ -1,14 +1,14 @@
-from sports_stats.nba.player import NBAPlayer
-
 import pandas as pd
 
+from sports_stats.nba.player import NBAPlayer
 from sports_stats.nba.team import NBAFranchise
+from sports_stats.nba.helpers import spellcheck
 
 def compare_players(players, stats, total='career'):
     '''
     Compare regular season, post season, and career totals between two players.
     '''
-
+    spellcheck()
     players = [NBAPlayer(player) for player in players]
     if not stats:
         if total == 'career':

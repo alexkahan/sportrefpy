@@ -1,7 +1,9 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+
 from sports_stats.nba.league import NBA
+from sports_stats.nba.helpers import spellcheck
 
 
 class NBAFranchise(NBA):
@@ -14,6 +16,7 @@ class NBAFranchise(NBA):
         self.players_url = self.team_url + 'players.html'
         self.coaches_url = self.team_url + 'coaches.html'
         self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
+        spellcheck()
 
     
     def players_all_time_stats(self, player=None):
