@@ -1,3 +1,5 @@
+import os
+
 from sports_stats.nba.league import NBA
 from sports_stats.nba.team import NBAFranchise
 
@@ -10,3 +12,7 @@ def all_players():
         with open('sports_stats/assets/nba_players.txt', 'w', errors='ignore') as file:
             for player in players:
                 file.write(f'{player}\n')
+
+def spellcheck():
+    if not os.path.exists('sports_stats/assets/nba_players.txt'):
+            all_players()
