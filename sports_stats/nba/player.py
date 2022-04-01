@@ -148,3 +148,7 @@ Player names are case-sensitive.'''
         career = pd.DataFrame(career.sum())
         career.rename(columns={0: 'Total'}, inplace=True)
         return career
+
+
+    def __repr__(self):
+        return f"<{self.full_name}>"
