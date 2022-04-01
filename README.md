@@ -51,6 +51,8 @@ showtime = compare_players(["Shaquille O'Neal", "Kobe Bryant"],
                             stats=['PTS', 'GS']
                             total='career')
 ```
+- _stats_ must be a list, with as many stats as you'd like. Required.
+- _total_ defaults to 'career', but can also be 'post' or 'reg'.
 
 
 ## Compare Franchise W/L records (Pandas DataFrame)
@@ -59,6 +61,7 @@ from sports_stats.nba.analysis import compare_franchises
 
 compare_franchises(['NYK', 'BOS'])
 ```
+- must be a list of teams, even if only using 1.
 
 ## Get stats of players/coaches for a specific Franchise (Pandas DataFrame)
 ```python
@@ -83,3 +86,12 @@ spurs.coaches_all_time_data()
 # Or just Pop
 spurs.coaches_all_time_data('Gregg Popovich')
 ```
+
+## Get roster for a given season (Pandas DataFrame)
+```python
+from sports_stats.nba.team import NBAFranchise
+
+warriors = NBAFranchise('GSW')
+warriors.roster(2016)
+```
+- use the integer for the year the season ends in. This example returns the 2015-16 Golden State Warriors.
