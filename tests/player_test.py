@@ -1,7 +1,9 @@
 import pytest
 import numpy as np
+
 from sports_stats.nba.team import NBAFranchise
 from sports_stats.nba.player import NBAPlayer
+from sports_stats.nba.analysis import compare_players
 from sports_stats.nhl.team import NHLFranchise
 from sports_stats.mlb.team import MLBFranchise
 
@@ -41,6 +43,10 @@ def test_NBA_player_post_season_game_log():
     dametime = NBAPlayer('Damian Lillard')
     gl = dametime.post_season_game_log()
     assert np.isnan(gl.loc[56, 'FG'])
+
+def test_NBA_player_comparison():
+    comparison = compare_players(["Shaquille O'Neal", "Kobe Bryant"], stats='PTS')
+    assert comparison.loc["Shaquille O'Neal", 'PTS'] < comparison.loc["Kobe Bryant", 'PTS']
 
 
 def test_NHL_goalie():

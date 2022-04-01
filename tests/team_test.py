@@ -1,5 +1,7 @@
 import pytest
+
 from sports_stats.nba.team import NBAFranchise
+from sports_stats.nba.analysis import compare_franchises
 from sports_stats.nhl.team import NHLFranchise
 from sports_stats.nfl.team import NFLFranchise
 from sports_stats.mlb.team import MLBFranchise
@@ -15,6 +17,10 @@ def test_NBA_seasons():
     celtics = NBAFranchise('boS')
     seasons = celtics.season_history()
     assert seasons.loc['2011-12', 'DRtg'] == 98.2
+
+def test_NBA_franchise_comparison():
+    comparison = compare_franchises(['PHI', 'CLE'])
+    assert comparison.loc['Philadelphia 76ers', 'W'] > comparison.loc['Cleveland Cavaliers', 'W']
 
 
 def test_NHL_franchise():
