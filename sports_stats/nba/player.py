@@ -29,6 +29,7 @@ class NBAPlayer(NBA):
                         self.playoff_url = self.game_log_url.replace('gamelog', 'gamelog-playoffs')
                     else:
                         self.playoffs = False
+                self.full_name = player
         else:
             raise PlayerNotFound(f'{player} not found. Please check the capitalization and/or the spelling.')
 
