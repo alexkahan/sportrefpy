@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
+import enchant
 
 from sports_stats.nba.league import NBA
 from sports_stats.errors.not_found import PlayerNotFound
@@ -12,6 +13,7 @@ class NBAPlayer(NBA):
     def __init__(self, player):
         super().__init__()
         
+        self.player_dict = enchant.PyPWL('sports_stats/assets/nba_players.txt')
         first_letter = player.split()[-1][0].lower()
         players = pd.read_html(self.url + f'/players/{first_letter}')[0]
         players['Player'] = players['Player'].apply(lambda x: x.split('*')[0])
@@ -23,15 +25,22 @@ class NBAPlayer(NBA):
                     self.player_url = self.url + item.find('a')['href']
                     response = requests.get(self.player_url)
                     soup = BeautifulSoup(response.text, features='lxml')
-                    self.game_log_url = self.player_url.replace('.html', '/gamelog/')
-                    if soup.find_all('div', attrs={'id': 'switcher_per_game-playoffs_per_game'}):
+                    self.game_log_url = self.player_url.\
+                        replace('.html', '/gamelog/')
+                    if soup.find_all('div', \
+                        attrs={'id': 'switcher_per_game-playoffs_per_game'}):
                         self.playoffs = True
-                        self.playoff_url = self.game_log_url.replace('gamelog', 'gamelog-playoffs')
+                        self.playoff_url = self.game_log_url.\
+                            replace('gamelog', 'gamelog-playoffs')
                     else:
                         self.playoffs = False
                 self.full_name = player
         else:
-            raise PlayerNotFound(f'{player} not found. Please check the capitalization and/or the spelling.')
+            suggestion = self.player_dict.suggest(player)[0]
+            message = f'''
+{player} not found. Is it possible you meant {suggestion}?
+Player names are case-sensitive.'''
+            raise PlayerNotFound(message)
 
     def regular_season_stats(self):
         '''
