@@ -14,7 +14,7 @@ class NBAPlayer(NBA):
     def __init__(self, player):
         super().__init__()
         
-        self.player_dict = enchant.PyPWL(os.path.dirname(__file__) + '/sportrefpy/assets/nba_players.txt')
+        self.player_dict = enchant.PyPWL(os.path.dirname(os.path.dirname(__file__)) + '\\assets\\nba_players.txt')
         first_letter = player.split()[-1][0].lower()
         players = pd.read_html(self.url + f'/players/{first_letter}')[0]
         players['Player'] = players['Player'].apply(lambda x: x.split('*')[0])
