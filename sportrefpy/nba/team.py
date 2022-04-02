@@ -68,7 +68,7 @@ class NBAFranchise(NBA):
 
     def roster(self, season=None):
         '''
-        Returns Pandas dataframe of current roster.
+        Returns Pandas dataframe of roster for a given year.
         '''
         if season:
             response = requests.get(self.team_url)
