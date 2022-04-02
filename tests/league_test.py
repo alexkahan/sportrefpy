@@ -1,10 +1,10 @@
 import pytest
-from sports_stats.nba.league import NBA
-from sports_stats.nhl.league import NHL
-from sports_stats.nfl.league import NFL
-from sports_stats.mlb.league import MLB
-from sports_stats.cbb.cbb import CBB
-from sports_stats.cfb.cfb import CFB
+from sportrefpy.nba.league import NBA
+from sportrefpy.nhl.league import NHL
+from sportrefpy.nfl.league import NFL
+from sportrefpy.mlb.league import MLB
+from sportrefpy.cbb.cbb import CBB
+from sportrefpy.cfb.cfb import CFB
 
 def test_NBA():
     nba = NBA()

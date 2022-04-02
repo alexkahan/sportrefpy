@@ -1,11 +1,11 @@
 import pytest
 import numpy as np
 
-from sports_stats.nba.team import NBAFranchise
-from sports_stats.nba.player import NBAPlayer
-from sports_stats.nba.analysis import compare_players
-from sports_stats.nhl.team import NHLFranchise
-from sports_stats.mlb.team import MLBFranchise
+from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.player import NBAPlayer
+from sportrefpy.nba.analysis import compare_players
+from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.mlb.team import MLBFranchise
 
 def test_NBA_player_FGA():
     sixers = NBAFranchise('PHI')

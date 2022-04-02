@@ -1,12 +1,12 @@
 import pytest
 
-from sports_stats.nba.team import NBAFranchise
-from sports_stats.nba.analysis import compare_franchises
-from sports_stats.nhl.team import NHLFranchise
-from sports_stats.nfl.team import NFLFranchise
-from sports_stats.mlb.team import MLBFranchise
-from sports_stats.cbb.cbb import CBBSchool
-from sports_stats.cfb.cfb import CFBSchool
+from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.analysis import compare_franchises
+from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nfl.team import NFLFranchise
+from sportrefpy.mlb.team import MLBFranchise
+from sportrefpy.cbb.cbb import CBBSchool
+from sportrefpy.cfb.cfb import CFBSchool
 
 
 def test_NBA_franchise():

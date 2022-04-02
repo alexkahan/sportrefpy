@@ -1,8 +1,8 @@
 import pytest
-from sports_stats.nba.team import NBAFranchise
-from sports_stats.nhl.team import NHLFranchise
-from sports_stats.nfl.team import NFLFranchise
-from sports_stats.mlb.team import MLBFranchise
+from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nfl.team import NFLFranchise
+from sportrefpy.mlb.team import MLBFranchise
 
 
 def test_NBA_coach_playoffs():
