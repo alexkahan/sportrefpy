@@ -1,4 +1,4 @@
-from pathlib import Path
+import os
 
 from sportrefpy.nba.league import NBA
 from sportrefpy.nba.team import NBAFranchise
@@ -9,7 +9,7 @@ def all_players():
         for team in nba.teams.keys():
             franchise = NBAFranchise(team)
             players.update(franchise.players_all_time_stats().index)
-        with open(Path(__file__).parent / 'sportrefpy/assets/nba_players.txt', 'w', encoding='ascii') as file:
+        with open(os.path.dirname(__file__) + '/sportrefpy/assets/nba_players.txt', 'w', encoding='ascii') as file:
             for player in players:
                 try:
                     file.write(f'{player}\n')
