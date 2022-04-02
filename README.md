@@ -1,7 +1,7 @@
 # WORK IN PROGRESS
 
-# Sports Stats
-Sports stats is package that pulls data from the [Sports-Reference](https://www.sports-reference.com/) family of sites. Currently, only NBA is working but NHL, NFL, MLB, and College Basketball and Football will be supported as soon as possible.
+# SPORTREFPY
+Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sports-reference.com/) family of sites. Currently, only NBA is working but NHL, NFL, MLB, and College Basketball and Football will be supported as soon as possible.
 
 # Installation
 ```bash
@@ -13,9 +13,9 @@ Below are some examples for ways that you can use Sports Stats.
 
 ## Initialize a league, team, and player
 ```python
-from sports_stats.nba.league import NBA
-from sports_stats.nba.team import NBAFranchise
-from sports_stats.nba.player import NBAPlayer
+from sportrefpy.nba.league import NBA
+from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.player import NBAPlayer
 
 nba = NBA()
 phi = NBAFranchise('PHI')
@@ -24,7 +24,7 @@ the_answer = NBAPlayer('Allen Iverson')
 
 ## Print out Franchise Codes (needed for initializing a team)
 ```python
-from sports_stats.nba.league import NBA
+from sportrefpy.nba.league import NBA
 
 nba = NBA()
 nba.franchise_codes()
@@ -32,7 +32,7 @@ nba.franchise_codes()
 
 ## Find the career totals (regular + playoffs) of a specific player (Pandas DataFrame)
 ```python
-from sports_stats.nba.player import NBAPlayer
+from sportrefpy.nba.player import NBAPlayer
 
 # For all stats
 king = NBAPlayer('LeBron James')
@@ -45,7 +45,7 @@ beard.career_totals()['PTS']
 
 ## Compare players stat totals (Pandas DataFrame)
 ```python
-from sports_stats.nba.analysis import compare_players
+from sportrefpy.nba.analysis import compare_players
 
 showtime = compare_players(["Shaquille O'Neal", "Kobe Bryant"], 
                             stats=['PTS', 'GS']
@@ -57,7 +57,7 @@ showtime = compare_players(["Shaquille O'Neal", "Kobe Bryant"],
 
 ## Compare Franchise W/L records (Pandas DataFrame)
 ```python
-from sports_stats.nba.analysis import compare_franchises
+from sportrefpy.nba.analysis import compare_franchises
 
 compare_franchises(['NYK', 'BOS'])
 ```
@@ -65,7 +65,7 @@ compare_franchises(['NYK', 'BOS'])
 
 ## Get stats of players/coaches for a specific Franchise (Pandas DataFrame)
 ```python
-from sports_stats.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBAFranchise
 
 # Players
 bulls = NBAFranchise('CHI')
@@ -89,7 +89,7 @@ spurs.coaches_all_time_data('Gregg Popovich')
 
 ## Get roster for a given season (Pandas DataFrame)
 ```python
-from sports_stats.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBAFranchise
 
 warriors = NBAFranchise('GSW')
 warriors.roster(2016)
