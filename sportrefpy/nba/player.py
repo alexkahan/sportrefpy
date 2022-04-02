@@ -137,7 +137,7 @@ Player names are case-sensitive.'''
                 return None
 
     
-    def career_totals(self):
+    def career_totals(self, stat=None):
         '''
         Find player totals (includes regular and post season)
         '''
@@ -151,7 +151,9 @@ Player names are case-sensitive.'''
              '2PA', 'FT', 'FTA', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', \
             'TOV', 'PF', 'PTS', 'Trp Dbl']]
         career = pd.DataFrame(career.sum())
-        career.rename(columns={0: 'Total'}, inplace=True)
+        career.rename(columns={0: self.full_name}, inplace=True)
+        if stat:
+            career = career.loc[stat]
         return career
 
 
