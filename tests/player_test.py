@@ -45,8 +45,8 @@ def test_NBA_player_post_season_game_log():
     assert np.isnan(gl.loc[56, 'FG'])
 
 def test_NBA_player_comparison():
-    comparison = compare_players(["Shaquille O'Neal", "Kobe Bryant"], stats='PTS')
-    assert comparison.loc["Shaquille O'Neal", 'PTS'] < comparison.loc["Kobe Bryant", 'PTS']
+    comparison = compare_players(["Shaquille O'Neal", "Kobe Bryant"], stats=['PTS'])
+    assert comparison.sum()['PTS'] == 73961.0
 
 
 def test_NHL_goalie():
