@@ -23,6 +23,7 @@ setup(
         'pandas >= 1.4.1',
         'pytest >= 7.1.1',
         'requests >= 2.27.1',
-        'urllib3 >= 1.26.9'
+        'urllib3 >= 1.26.9',
+        'pyenchant >=3.2.2',
     ]
 )
