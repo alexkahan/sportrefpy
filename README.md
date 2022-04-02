@@ -28,7 +28,7 @@ nba = NBA()
 nba.franchise_codes()
 ```
 
-## Find the career totals (regular + playoffs) of a specific player (Pandas DataFrame)
+## Find the career totals (regular + playoffs) of a specific player
 ```python
 from sportrefpy.nba.player import NBAPlayer
 
@@ -36,24 +36,25 @@ from sportrefpy.nba.player import NBAPlayer
 king = NBAPlayer('LeBron James')
 king.career_totals()
 
-# For a specific stat
+# For a specific stats
 beard = NBAPlayer('James Harden')
-beard.career_totals()['PTS']
+beard.career_totals(stats=['PTS', 'G'])
 ```
+- _stats_ is None by default. If provide, it must be a list even if only using 1.
 
-## Compare players stat totals (Pandas DataFrame)
+## Compare players stat totals
 ```python
 from sportrefpy.nba.analysis import compare_players
 
 showtime = compare_players(["Shaquille O'Neal", "Kobe Bryant"], 
-                            stats=['PTS', 'GS']
+                            stats=['PTS', 'TRB'],
                             total='career')
 ```
 - _stats_ must be a list, with as many stats as you'd like. Required.
 - _total_ defaults to 'career', but can also be 'post' or 'reg'.
 
 
-## Compare Franchise W/L records (Pandas DataFrame)
+## Compare Franchise W/L records
 ```python
 from sportrefpy.nba.analysis import compare_franchises
 
@@ -61,7 +62,7 @@ compare_franchises(['NYK', 'BOS'])
 ```
 - must be a list of teams, even if only using 1.
 
-## Get stats of players/coaches for a specific Franchise (Pandas DataFrame)
+## Get stats of players/coaches for a specific Franchise
 ```python
 from sportrefpy.nba.team import NBAFranchise
 
@@ -85,11 +86,11 @@ spurs.coaches_all_time_data()
 spurs.coaches_all_time_data('Gregg Popovich')
 ```
 
-## Get roster for a given season (Pandas DataFrame)
+## Get roster for a given season
 ```python
 from sportrefpy.nba.team import NBAFranchise
 
 warriors = NBAFranchise('GSW')
 warriors.roster(2016)
 ```
-- use the integer for the year the season ends in. This example returns the 2015-16 Golden State Warriors.
+- use integer year that season ends in. This example returns the 2015-16 Golden State Warriors.
