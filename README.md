@@ -5,7 +5,7 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
 
 # Installation
 ```bash
-TBD
+pip install sportrefpy
 ```
 
 # Usage
