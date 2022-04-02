@@ -7,7 +7,7 @@ setup(
     name='sportrefpy',
     author='alex kahan',
     author_email='kahanscious@gmail.com',
-    version='0.0.2',
+    version='0.0.3',
     description='pull sports stats',
     long_description=long_description,
     long_description_content_type="text/markdown",
