@@ -10,6 +10,11 @@ def test_NBA():
     nba = NBA()
     assert len(nba.teams) == 30
 
+def test_NBA_standings():
+    nba = NBA()
+    assert len(nba.conference_standings('east')) == 15 and \
+        len(nba.conference_standings('west')) == 15
+
 
 def test_NHL():
     nhl = NHL()
