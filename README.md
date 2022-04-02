@@ -40,7 +40,7 @@ king.career_totals()
 beard = NBAPlayer('James Harden')
 beard.career_totals(stats=['PTS', 'G'])
 ```
-- _stats_ is None by default. If provide, it must be a list even if only using 1.
+- _stats_ is None by default. If provided, it must be a list even if only using 1.
 
 ## Compare players stat totals
 ```python
@@ -94,3 +94,18 @@ warriors = NBAFranchise('GSW')
 warriors.roster(2016)
 ```
 - use integer year that season ends in. This example returns the 2015-16 Golden State Warriors.
+
+
+## Get current season standings
+```python
+from sportrefpy.nba.league import NBA
+
+nba = NBA()
+
+# Both conferences
+east, west = nba.current_standings()
+
+# Just one of them
+west = nba.current_standings(conf='west')
+east = nba.current_standings(conf='east')
+```
