@@ -75,18 +75,17 @@ class NBAFranchise(NBA):
             soup = BeautifulSoup(response.text, features='lxml')
             for i in soup.find_all('th', attrs={'class': 'left'}):
                 if str(season) in i.find('a')['href']:
-                    current_roster = pd.read_html(self.url + i.find('a')['href'])[0]
+                    roster = pd.read_html(self.url + i.find('a')['href'])[0]
                     break
-            current_roster.drop(columns={'Unnamed: 6'}, inplace=True)
-            current_roster['Exp'] = current_roster['Exp'].replace('R', 0)
-            current_roster['Player'] = current_roster['Player'].apply(lambda \
-                x: x.split(' (TW)')[0])
-            current_roster.set_index('Player', inplace=True)
-            current_roster['Exp'] = current_roster['Exp'].apply(lambda x:\
-                 int(x))
-            current_roster['Birth Date'] = current_roster['Birth Date'].apply(\
-                lambda x: pd.to_datetime(x))
-            return current_roster
+            roster.drop(columns={'Unnamed: 6'}, inplace=True)
+            roster['Exp'] = roster['Exp'].replace('R', 0)
+            roster['Player'] = roster['Player'].apply(lambda \
+                x: x.split('(TW)')[0])
+            roster.set_index('Player', inplace=True)
+            roster['Exp'] = roster['Exp'].apply(lambda x: int(x))
+            roster['Birth Date'] = roster['Birth Date']\
+                .apply(lambda x: pd.to_datetime(x))
+            return roster
         else:
             return None
 

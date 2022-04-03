@@ -14,7 +14,8 @@ class NBAPlayer(NBA):
     def __init__(self, player):
         super().__init__()
         
-        self.player_dict = enchant.PyPWL(os.path.dirname(os.path.dirname(__file__)) + '\\assets\\nba_players.txt')
+        player_dict = enchant.PyPWL(os.path.dirname\
+            (os.path.dirname(__file__)) + '\\assets\\nba_players.txt')
         first_letter = player.split()[-1][0].lower()
         players = pd.read_html(self.url + f'/players/{first_letter}')[0]
         players['Player'] = players['Player'].apply(lambda x: x.split('*')[0])
@@ -38,7 +39,7 @@ class NBAPlayer(NBA):
                 self.full_name = player
         else:
             try:
-                suggestion = self.player_dict.suggest(player)[0]
+                suggestion = player_dict.suggest(player)[0]
                 message = f'''<{player}> not found. 
 Is it possible you meant {suggestion}?
 Player names are case-sensitive.'''
@@ -121,13 +122,15 @@ Player names are case-sensitive.'''
                     'Rk': 'G', 
                     'GS': 'Start'}, 
                     inplace=True)
-                playoffs.rename(columns={playoffs.columns[1]: 'Date'}, inplace=True)
+                playoffs.rename(columns={playoffs.columns[1]: 'Date'}, 
+                                inplace=True)
                 playoffs = playoffs[playoffs['G'] != 'Rk']
                 playoffs.replace('Inactive', np.nan, inplace=True)
                 playoffs.reset_index(inplace=True, drop=True)
                 for column in playoffs.columns:
                         try:
-                            playoffs[column] = pd.to_numeric(playoffs[column], errors='ignore')
+                            playoffs[column] = pd.to_numeric\
+                                (playoffs[column], errors='ignore')
                         except:
                             continue
                 playoffs.set_index('G', inplace=True)
