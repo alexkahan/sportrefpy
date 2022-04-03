@@ -61,8 +61,13 @@ def test_NHL_skaters():
 
 def test_NHL_player():
     panthers = NHLFranchise('FLA')
-    players = panthers.current_roster()
+    players = panthers.roster()
     assert 'Aleksander Barkov' in players.index
+
+def test_NHL_seasons():
+    redwings = NHLFranchise('DET')
+    seasons = redwings.season_history('2012-13')
+    assert seasons.loc['W'] == 24
 
 
 def test_MLB_batter():

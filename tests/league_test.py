@@ -20,6 +20,11 @@ def test_NHL():
     nhl = NHL()
     assert len(nhl.teams) == 32
 
+def test_NHL_standings():
+    nhl = NHL()
+    assert len(nhl.conference_standings('east')) == 16 and \
+        len(nhl.conference_standings('west')) == 16
+
 
 def test_NFL():
     nfl = NFL()

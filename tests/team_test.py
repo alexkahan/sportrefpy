@@ -1,12 +1,13 @@
 import pytest
 
 from sportrefpy.nba.team import NBAFranchise
-from sportrefpy.nba.analysis import compare_franchises
+from sportrefpy.nba.analysis import compare_franchises as nba_compare_franchises
 from sportrefpy.nhl.team import NHLFranchise
 from sportrefpy.nfl.team import NFLFranchise
 from sportrefpy.mlb.team import MLBFranchise
 from sportrefpy.cbb.cbb import CBBSchool
 from sportrefpy.cfb.cfb import CFBSchool
+from sportrefpy.nhl.analysis import compare_franchises as nhl_compare_franchises
 
 
 def test_NBA_franchise():
@@ -19,18 +20,36 @@ def test_NBA_seasons():
     assert seasons.loc['2011-12', 'DRtg'] == 98.2
 
 def test_NBA_franchise_comparison():
-    comparison = compare_franchises(['PHI', 'CLE'])
+    comparison = nba_compare_franchises(['PHI', 'CLE'])
     assert comparison.loc['Philadelphia 76ers', 'W'] > comparison.loc['Cleveland Cavaliers', 'W']
 
 
 def test_NHL_franchise():
     golden_knights = NHLFranchise('VEG')
-    assert golden_knights.franchise == "Vegas Golden Knights"
+    assert golden_knights.franchise_name == "Vegas Golden Knights"
 
 def test_NHL_seasons():
     buffalo = NHLFranchise('BUF')
     seasons = buffalo.season_history()
     assert seasons.loc['1999-00', 'Finish'] == '3rd of 5'
+
+def test_NHL_roster():
+    flyers = NHLFranchise('PHI')
+    assert 'Scott Laughton' in flyers.roster(2022).index
+
+def test_NHL_goalies():
+    hurricanes = NHLFranchise('CAR')
+    goalies = hurricanes.goalies_all_time_stats()
+    assert goalies.loc['Cam Ward', 'SV'] == 17261
+
+def test_NHL_skaters():
+    penguins = NHLFranchise('PIT')
+    skaters = penguins.skaters_all_time_stats()
+    assert skaters.loc['Mario Lemieux', 'G'] == 690
+
+def test_NHL_franchise_comparison():
+    comparison = nhl_compare_franchises(['TBL', 'DET'])
+    assert comparison.loc['Tampa Bay Lightning', 'W'] < comparison.loc['Detroit Red Wings', 'W']
 
 
 def test_NFL_franchise():
