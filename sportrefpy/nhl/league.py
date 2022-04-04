@@ -30,7 +30,6 @@ class NHL:
     def conference_standings(self, conf=None):
         # Eastern Conference
         east_conf = pd.read_html(self.standings_url)[-2]
-        east_conf.index = east_conf.index + 1
         east_conf.rename(columns={'Unnamed: 0': 'Team'}, inplace=True)
         east_conf = east_conf[~east_conf['Team'].str.contains('Division')]
         east_conf = east_conf.apply(pd.to_numeric, errors='ignore')
@@ -40,7 +39,6 @@ class NHL:
 
         # Western Conference
         west_conf = pd.read_html(self.standings_url)[-1]
-        west_conf.index = west_conf.index + 1
         west_conf.rename(columns={'Unnamed: 0': 'Team'}, inplace=True)
         west_conf = west_conf[~west_conf['Team'].str.contains('Division')]
         west_conf = west_conf.apply(pd.to_numeric, errors='ignore')
