@@ -250,17 +250,6 @@ seasons[seasons['Playoffs']  == 'Won Stanley Cup Final']]
 
 ## NFL
 
-### Initialize a league, team, or player
-```python
-from sportrefpy.nfl.league import NFL
-from sportrefpy.nfl.team import NFLFranchise
-from sportrefpy.nfl.player import NFLPlayer
-
-nfl = NFL()
-sixers = NFLFranchise('PHI')
-the_answer = NFLPlayer('Allen Iverson')
-```
-
 ### Print out Franchise Codes (needed for initializing a team)
 ```python
 from sportrefpy.nfl.league import NFL
@@ -276,11 +265,11 @@ from sportrefpy.nfl.league import NFL
 nfl = NFL()
 
 # Both conferences
-afc, nfc = nhl.conference_standings()
+afc, nfc = nfl.conference_standings()
 
 # Just one of them
-nfc = nhl.conference_standings(conf='NFC')
-afc = nhl.conference_standings(conf='AFC')
+nfc = nfl.conference_standings(conf='NFC')
+afc = nfl.conference_standings(conf='AFC')
 ```
 
 ## Saving Data
