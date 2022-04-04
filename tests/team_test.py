@@ -61,6 +61,11 @@ def test_NFL_seasons():
     seasons = eagles.season_history()
     assert seasons.loc[2017, 'Playoffs'] == 'Won SB'
 
+def test_NFL_coaching():
+    jets = NFLFranchise('nyj')
+    coaches = jets.coaches_all_time_data()
+    assert 'Rex Ryan' in coaches.index
+
 
 def test_MLB_franchise():
     dodgers = MLBFranchise('LAD')
