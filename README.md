@@ -1,5 +1,5 @@
 # SPORTREFPY
-Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sports-reference.com/) family of sites. Currently, only NBA is working but NHL, NFL, MLB, and College Basketball and Football will be supported as soon as possible.
+Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sports-reference.com/) family of sites. Currently, only the NBA and NHL are working but NFL, MLB, and College Basketball and Football will be supported as soon as possible.
 
 # Table of Contents
 - [Installation](#installation)
@@ -13,7 +13,7 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
         - [Team-specific Player Stats](#get-stats-of-players-for-a-specific-franchise)
         - [Team-specific Coach Stats](#get-stats-of-coaches-for-a-specific-franchise)
         - [Roster](#get-roster-for-a-given-season)
-        - [Current Season Standings](#get-current-season-standings)
+        - [Current Season Standings](#get-current-season-standings-by-conference)
         - [Get Franchise Season History](#get-franchise-season-history)
         - [Find which seasons a team won the NBA Finals](#find-which-seasons-a-team-won-the-nba-finals)
     - [NHL](#nhl)
@@ -21,8 +21,13 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-1)
         - [Compare Franchises](#compare-franchise-wl-records-1)
         - [Roster](#get-roster-for-a-given-season-1)
+        - [Current Season Standings](#get-current-season-standings-by-conference-1)
         - [Get Franchise Season History](#get-franchise-season-history-1)
         - [Get Stanley Cup winning seasons](#get-stanley-cup-winning-seasons)
+    - [NFL](#nfl)
+	    - [Initialize a league, team, or player](#initialize-a-league-team-or-player-2)
+        - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-2)
+        - [Conference Standings](#get-conference-standings-by-season)
     - [Saving Data](#saving-data)
 
 
@@ -32,7 +37,8 @@ pip install sportrefpy
 ```
 
 # Usage
-Below are some examples for ways that you can use Sports Stats.
+Each league is more or less set up the same, but they do have some slight differences.
+Below are some examples for ways that you can use sportrefpy for each sport.
 
 ## NBA
 
@@ -125,18 +131,18 @@ warriors.roster(2016)
 - use integer year that season ends in. This example returns the 2015-16 Golden State Warriors.
 
 
-### Get current season standings
+### Get current season standings by conference
 ```python
 from sportrefpy.nba.league import NBA
 
 nba = NBA()
 
 # Both conferences
-east, west = nba.current_standings()
+east, west = nba.conference_standings()
 
 # Just one of them
-west = nba.current_standings(conf='west')
-east = nba.current_standings(conf='east')
+west = nba.conference_standings(conf='west')
+east = nba.conference_standings(conf='east')
 ```
 
 
@@ -203,6 +209,19 @@ blues.roster(2019)
 ```
 - use integer year that season ends in. This example returns the 2018-19 St. Louis Blues.
 
+### Get current season standings by conference
+```python
+from sportrefpy.nhl.league import NHL
+
+nhl = NHL()
+
+# Both conferences
+east, west = nhl.conference_standings()
+
+# Just one of them
+west = nhl.conference_standings(conf='west')
+east = nhl.conference_standings(conf='east')
+```
 
 ### Get franchise season history
 ```python
@@ -226,6 +245,42 @@ from sportrefpy.nhl.team import NHLFranchise
 leafs = NHLFranchise('TOR')
 seasons = leafs.season_history()
 seasons[seasons['Playoffs']  == 'Won Stanley Cup Final']]
+```
+
+
+## NFL
+
+### Initialize a league, team, or player
+```python
+from sportrefpy.nfl.league import NFL
+from sportrefpy.nfl.team import NFLFranchise
+from sportrefpy.nfl.player import NFLPlayer
+
+nfl = NFL()
+sixers = NFLFranchise('PHI')
+the_answer = NFLPlayer('Allen Iverson')
+```
+
+### Print out Franchise Codes (needed for initializing a team)
+```python
+from sportrefpy.nfl.league import NFL
+
+nfl = NFL()
+nfl.franchise_codes()
+```
+
+### Get conference standings by season
+```python
+from sportrefpy.nfl.league import NFL
+
+nfl = NFL()
+
+# Both conferences
+afc, nfc = nhl.conference_standings()
+
+# Just one of them
+nfc = nhl.conference_standings(conf='NFC')
+afc = nhl.conference_standings(conf='AFC')
 ```
 
 ## Saving Data
