@@ -1,6 +1,8 @@
-from sportrefpy.nfl.league import NFL
 import pandas as pd
 import numpy as np
+
+from sportrefpy.nfl.league import NFL
+
 
 class NFLFranchise(NFL):
     def __init__(self, franchise):
@@ -8,9 +10,7 @@ class NFLFranchise(NFL):
         self.abbreviation = franchise.upper()
         self.franchise = self.teams[franchise.lower()]['team_name']
         self.team_url = self.teams[franchise.lower()]['url']
-        self.players_url = self.team_url + 'players.html'
-        self.coaches_url = self.team_url + 'coaches.htm'
-        self.current_roster_url = f'{self.url}/contracts/{self.abbreviation}.html'
+        self.coaches_url = f'{self.team_url}coaches.htm'
     
     # def players_all_time_stats(self):
     #     '''
@@ -36,29 +36,34 @@ class NFLFranchise(NFL):
         Returns Pandas dataframe of all historical coach data.
         '''
 
-        coaches = pd.read_html(self.coaches_url, header=[1])[0]
+        coaches = pd.read_html(self.coaches_url, header=[1], attrs={'id': 'coach_sums'})[0]
         coaches['Coach'] = coaches['Coach'].apply(lambda x: x.split('+')[0])
-        coaches = coaches[coaches['Coach'] != 'Coach']
+        # coaches = coaches[coaches['Coach'] != 'Coach']
         coaches.set_index('Coach', inplace=True)
         coaches = coaches.apply(pd.to_numeric)
 
         return coaches
 
 
-    # def current_roster(self):
+    # def roster(self, year=None):
     #     '''
     #     Returns Pandas dataframe of current roster.
     #     '''
+    #     roster_url = f'{self.team_url}{str(year)}_roster.htm'
+    #     r = requests.get(roster_url)
+    #     soup = BeautifulSoup(r.content, 'html.parser')
 
-    #     current_roster = pd.read_html(self.current_roster_url)[0]
-    #     current_roster = current_roster[current_roster.columns[:2]]
-    #     current_roster.columns = ['Player', 'Age']
-    #     current_roster = current_roster[current_roster['Player']\
-    #          != 'Team Totals']
-    #     current_roster.set_index('Player', inplace=True)
-    #     current_roster['Age'] = current_roster['Age'].apply(lambda x: int(x))
+    #     for comment in soup.find_all(text=lambda text: isinstance(text, Comment)):
+    #         if comment.find("<table ") > 0:
+    #             comment_soup = BeautifulSoup(comment, 'html.parser')
+    #             table = comment_soup.find("table")
+    #             print(table.string)
+        
 
-    #     return current_roster
+        # roster = roster[roster['Player']!= 'Player']
+        # roster.set_index('Player', inplace=True)
+        # roster['Yrs'] = roster['Years'].replace('Rook', 0)
+        # return roster
 
     
     def season_history(self):
