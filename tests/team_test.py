@@ -76,6 +76,21 @@ def test_MLB_seasons():
     seasons = nyy.season_history()
     assert seasons.loc[1921, 'Playoffs'] == 'Lost WS (5-3)'
 
+def test_MLB_roster():
+    braves = MLBFranchise('ATL')
+    roster = braves.roster(1995)
+    assert 'Chipper Jones' in roster.index
+
+def test_MLB_batters():
+    dodgers = MLBFranchise('LAD')
+    batters = dodgers.batters_all_time_stats()
+    assert batters.loc['Jackie Robinson', 'G'] == 1382
+
+def test_MLB_pitchers():
+    pirates = MLBFranchise('PIT')
+    pitchers = pirates.pitchers_all_time_stats()
+    assert pitchers.loc['Jim Bunning', 'L'] == 23
+
 
 def test_CBB_school():
     af = CBBSchool('air-force')

@@ -33,7 +33,7 @@ def test_NFL_coach():
     assert coaches.loc['Dick Vermeil', 'W-L%'] == 0.535
 
 
-def test_MLB_manager():
-    nym = MLBFranchise('NYM')
-    managers = nym.managers_all_time_data()
-    assert managers.loc['Gil Hodges', 'BestFin'] == 1
+def test_MLB_managers():
+    reds = MLBFranchise('CIN')
+    managers = reds.managers_all_time_stats()
+    assert managers.loc['Buck Ewing', 'W'] == 394
