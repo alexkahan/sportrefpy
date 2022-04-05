@@ -28,6 +28,9 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
 	    - [Initialize a league, team, or player](#initialize-a-league-team-or-player-2)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-2)
         - [Conference Standings](#get-conference-standings-by-season)
+    - [MLB](#mlb)
+        - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-3)
+        - [Standings](#get-league-and-conference-standings-by-year)
     - [Saving Data](#saving-data)
 
 
@@ -282,3 +285,29 @@ from sportrefpy.nba.analysis import compare_franchises
 
 compare_franchises(['IND', 'MIL']).to_csv('comparison.csv')
 ```
+
+
+## MLB
+
+### Print out Franchise Codes (needed for initializing a team)
+```python
+from sportrefpy.mlb.league import MLB
+
+mlb = MLB()
+mlb.franchise_codes()
+```
+
+### Get league and conference standings by year
+```python
+from sportrefpy.mlb.league import MLB
+
+mlb = MLB()
+
+# Overall standings
+standings = mlb.standings(season=2018)
+
+# Just one of them
+al = mlb.al_standings(season=1990)
+nl = mlb.conference_standings()
+```
+- _season_ defaults to the current season if nothing is provided.
