@@ -30,6 +30,9 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
         - [Conference Standings](#get-conference-standings-by-season)
     - [MLB](#mlb)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-3)
+        - [Team-specific Batters Stats](#get-stats-of-batters-for-a-specific-franchise)
+        - [Team-specific Pitchers Stats](#get-stats-of-pitchers-for-a-specific-franchise)
+        - [Team-specific Manager Stats](#get-stats-of-managers-for-a-specific-franchise)
         - [Standings](#get-league-and-conference-standings-by-year)
     - [Saving Data](#saving-data)
 
@@ -296,6 +299,54 @@ from sportrefpy.mlb.league import MLB
 mlb = MLB()
 mlb.franchise_codes()
 ```
+
+### Get stats of batters for a specific Franchise
+```python
+from sportrefpy.mlb.team import MLBFranchise
+
+dodgers = MLBFranchise('LAD')
+
+# All players that have ever played for the team
+dodgers.players_all_time_stats()
+
+# Or just one player
+dodgers.players_all_time_stats('Jackie Robinson')
+```
+
+### Get stats of pitchers for a specific Franchise
+```python
+from sportrefpy.mlb.team import MLBFranchise
+
+pirates = NBAFranchise('PIT')
+
+# All players that have ever played for the team
+pirates.players_all_time_stats()
+
+# Or just one pitcher with a cool name
+pirates.pitchers_all_time_stats('High Pockets Kelly')
+```
+
+### Get stats of managers for a specific Franchise
+```python
+from sportrefpy.mlb.team import MLBFranchise
+
+reds = MLBFranchise('CIN')
+
+# All managers for that team
+reds.coaches_all_time_data()
+
+# Or just Buck
+reds.managers_all_time_stats('Buck Ewing')
+```
+
+### Get roster for a given season
+```python
+from sportrefpy.mlb.team import MLBFranchise
+
+braves = MLBFranchise('ATL')
+braves.roster(1995)
+```
+- use integer year that season ends in. This example returns the 1994-95 Atlanta Braves.
 
 ### Get league and conference standings by year
 ```python
