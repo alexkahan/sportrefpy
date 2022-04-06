@@ -35,6 +35,11 @@ def test_MLB():
     mlb = MLB()
     assert len(mlb.teams) == 30
 
+def test_MLB_standings():
+    mlb = MLB()
+    standings = mlb.standings(2020)
+    assert standings.loc[1, 'Team'] == 'Los Angeles Dodgers'
+
 
 def test_CBB():
     cbb = CBB()
