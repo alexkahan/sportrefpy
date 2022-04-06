@@ -39,8 +39,8 @@ class MLB:
         if season is None:
             season=self.current_season_year
 
-        page = requests.get(f'{self.url}/leagues/majors/{str(season)}-standings.shtml').text
-        soup = BeautifulSoup(page, 'html.parser')
+        page = requests.get(f'{self.url}/leagues/majors/{str(season)}-standings.shtml')
+        soup = BeautifulSoup(page.text, 'html.parser')
 
         comments = soup.find_all(string=lambda text:isinstance(text, Comment))
 
