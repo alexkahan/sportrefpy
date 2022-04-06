@@ -169,3 +169,20 @@ Player names are case-sensitive.'''
         pitching.set_index('Year', inplace=True)
 
         return pitching
+
+
+    def career_totals_pitching(self):
+        if not self.pitcher:
+            return None
+        reg = self.regular_season_pitching()
+        reg.reset_index(inplace=True)
+        post = self.post_season_pitching()
+        post.reset_index(inplace=True)
+        career = reg.merge(post, how='outer')
+        career = career[['G', 'GS', 'GF', 'CG', 'SHO', 'SV', 'IP', 'H', 'R', \
+            'ER', 'HR', 'BB', 'IBB', 'SO', 'HBP', 'BK', 'WP', 'BF', 'ERA+', \
+            'FIP', 'WHIP']]
+        career = pd.DataFrame(career.sum())
+        career = career.apply(pd.to_numeric, errors='ignore')
+        career.rename(columns={0: self.full_name}, inplace=True)
+        return career
