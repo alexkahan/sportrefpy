@@ -29,7 +29,9 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-2)
         - [Conference Standings](#get-conference-standings-by-season)
     - [MLB](#mlb)
+        - [Initialize league, team, or player](#initialize-a-league-team-or-player-2)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-3)
+        - [Compare Franchises]()
         - [Team-specific Batters Stats](#get-stats-of-batters-for-a-specific-franchise)
         - [Team-specific Pitchers Stats](#get-stats-of-pitchers-for-a-specific-franchise)
         - [Team-specific Manager Stats](#get-stats-of-managers-for-a-specific-franchise)
@@ -292,6 +294,17 @@ compare_franchises(['IND', 'MIL']).to_csv('comparison.csv')
 
 ## MLB
 
+### Initialize a league, team, or player
+```python
+from sportrefpy.mlb.league import MLB
+from sportrefpy.mlb.team import MLBFranchise
+from sportrefpy.mlb.player import MLBPlayer
+
+mlb = MLB()
+tigers = MLBFranchise('DET')
+hank = MLBPlayer('Henry Aaron')
+```
+
 ### Print out Franchise Codes (needed for initializing a team)
 ```python
 from sportrefpy.mlb.league import MLB
@@ -300,6 +313,14 @@ mlb = MLB()
 mlb.franchise_codes()
 ```
 
+### Compare Franchise W/L records
+```python
+from sportrefpy.mlb.analysis import compare_franchises
+
+compare_franchises(['MIL', 'LAA'])
+```
+- must be a list of teams, even if only using 1.
+
 ### Get stats of batters for a specific Franchise
 ```python
 from sportrefpy.mlb.team import MLBFranchise
@@ -307,10 +328,10 @@ from sportrefpy.mlb.team import MLBFranchise
 dodgers = MLBFranchise('LAD')
 
 # All players that have ever played for the team
-dodgers.players_all_time_stats()
+dodgers.batters_all_time_stats()
 
 # Or just one player
-dodgers.players_all_time_stats('Jackie Robinson')
+dodgers.batters_all_time_stats('Jackie Robinson')
 ```
 
 ### Get stats of pitchers for a specific Franchise
@@ -339,6 +360,62 @@ reds.coaches_all_time_data()
 reds.managers_all_time_stats('Buck Ewing')
 ```
 
+### Get regular season batting stats
+```python
+from sportrefpy.mlb.player import MLBPlayer
+
+the_kid = MLBPlayer('Ken Griffey Jr.')
+
+# Get all seasons stats
+the_kid.regular_season_batting()
+
+# Or a specific season
+the_kid.regular_season_batting(2009)
+```
+- *post_season_batting()* functions the same way
+
+### Get regular season pitching stats
+```python
+from sportrefpy.mlb.player import MLBPlayer
+
+sandy = MLBPlayer('Sandy Koufax')
+
+# Get all seasons stats
+sandy.regular_season_pitching()
+
+# Or a specific season
+sandy.regular_season_pitching(1966)
+```
+- *post_season_pitching()* functions the same way
+
+
+### Get regular season fielding stats
+```python
+from sportrefpy.mlb.player import MLBPlayer
+
+cal = MLBPlayer('Cal Ripken Jr.')
+
+# Get all seasons stats
+cal.regular_season_fielding()
+
+# Or a specific season
+cal.regular_season_fielding(1996)
+```
+
+### Get career pitching stats
+```python
+from sportrefpy.mlb.player import MLBPlayer
+
+madbum = MLBPlayer('Madison Bumgarner')
+
+# Get all pitching totals
+madbum.career_totals_pitching()
+
+# Or a specific stat
+madbum.career_totals_pitching('IP')
+```
+- _stat_ defaults to the current season if nothing is provided.
+
 ### Get roster for a given season
 ```python
 from sportrefpy.mlb.team import MLBFranchise
@@ -346,7 +423,6 @@ from sportrefpy.mlb.team import MLBFranchise
 braves = MLBFranchise('ATL')
 braves.roster(1995)
 ```
-- use integer year that season ends in. This example returns the 1994-95 Atlanta Braves.
 
 ### Get league and conference standings by year
 ```python
