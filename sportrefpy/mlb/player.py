@@ -51,7 +51,7 @@ Player names are case-sensitive.'''
             raise PlayerNotFound(message)
 
 
-    def regular_season_batting(self):
+    def regular_season_batting(self, season=None, stat=None):
         '''
         Returns a players regular seasons batting stats by career.
         '''
@@ -80,10 +80,15 @@ Player names are case-sensitive.'''
             batting = batting.apply(pd.to_numeric, errors='ignore')
             batting.set_index('Year', inplace=True)
 
+        if season:
+            try:
+                return batting.loc[season]
+            except KeyError:
+                return None
         return batting
 
 
-    def regular_season_pitching(self):
+    def regular_season_pitching(self, season=None):
         '''
         Returns a players regular seasons pitching stats by career.
         '''
@@ -94,12 +99,17 @@ Player names are case-sensitive.'''
             pitching = pitching[pitching['Lg'].str.contains('NL|AL|MLB')]
             pitching = pitching.apply(pd.to_numeric, errors='ignore')
             pitching.set_index('Year', inplace=True)
+            if season:
+                try:
+                    return pitching.loc[season]
+                except KeyError:
+                    return None
             return pitching
         else:
             return None
 
     
-    def regular_season_fielding(self):
+    def regular_season_fielding(self, season=None):
         '''
         Returns a players regular seasons fielding stats by career.
         '''
@@ -119,11 +129,15 @@ Player names are case-sensitive.'''
         fielding = fielding[fielding['Lg'].str.contains('NL|AL|MLB')]
         fielding = fielding.apply(pd.to_numeric, errors='ignore')
         fielding.set_index('Year', inplace=True)
-
+        if season:
+            try:
+                return fielding.loc[season]
+            except KeyError:
+                return None
         return fielding
 
 
-    def post_season_batting(self):
+    def post_season_batting(self, season=None):
         if not self.playoffs:
             return None
         response = requests.get(self.player_url)
@@ -143,11 +157,15 @@ Player names are case-sensitive.'''
         batting = batting[batting['Lg'].str.contains('NL|AL|MLB')]
         batting = batting.apply(pd.to_numeric, errors='ignore')
         batting.set_index('Year', inplace=True)
-
+        if season:
+            try:
+                return batting.loc[season]
+            except KeyError:
+                return None
         return batting
 
 
-    def post_season_pitching(self):
+    def post_season_pitching(self, season=None):
         if not self.pitcher:
             return None
         response = requests.get(self.player_url)
@@ -167,22 +185,48 @@ Player names are case-sensitive.'''
         pitching = pitching[pitching['Lg'].str.contains('NL|AL|MLB')]
         pitching = pitching.apply(pd.to_numeric, errors='ignore')
         pitching.set_index('Year', inplace=True)
-
+        if season:
+            try:
+                return pitching.loc[season]
+            except KeyError:
+                return None
         return pitching
 
 
-    def career_totals_pitching(self):
-        if not self.pitcher:
+    def career_totals_pitching(self, stat=None):
+        if self.pitcher:
+            reg = pd.read_html(self.player_url, attrs={'id': 'pitching_standard'})[0]
+            reg = reg[reg['Year'].str.contains('Yrs', na=False)]
+            reg = reg.apply(pd.to_numeric, errors='ignore')
+            reg.reset_index(drop=True, inplace=True)
+            reg.drop(columns={'Year', 'Age', 'Tm', 'Lg', 'Awards'}, 
+                        inplace=True)
+
+            response = requests.get(self.player_url)
+            soup = BeautifulSoup(response.text, features='lxml')
+            comments = soup.find_all(string=lambda text:isinstance(text, Comment))
+            tables = []
+            for comment in comments:
+                if 'pitching_postseason' in str(comment):
+                    try:
+                        tables.append(pd.read_html(str(comment)))
+                    except:
+                        continue
+            post = tables[0][0]
+            post = post[post['Year'].str.contains('Yrs', na=False)]
+            post = post.apply(pd.to_numeric, errors='ignore')
+            post.drop(columns={'Year', 'Age', 'Tm', 'Lg'}, 
+                        inplace=True)
+            career = reg.merge(post, how='outer')
+            career.drop(columns={'Series', 'Rslt', 'Opp', 'WPA', 'cWPA'}, inplace=True)
+            career = pd.DataFrame(career.sum())
+            career.columns = ['Totals']
+
+            if stat:
+                try:
+                    return career.loc[stat]
+                except KeyError:
+                    return None
+            return career
+        else:
             return None
-        reg = self.regular_season_pitching()
-        reg.reset_index(inplace=True)
-        post = self.post_season_pitching()
-        post.reset_index(inplace=True)
-        career = reg.merge(post, how='outer')
-        career = career[['G', 'GS', 'GF', 'CG', 'SHO', 'SV', 'IP', 'H', 'R', \
-            'ER', 'HR', 'BB', 'IBB', 'SO', 'HBP', 'BK', 'WP', 'BF', 'ERA+', \
-            'FIP', 'WHIP']]
-        career = pd.DataFrame(career.sum())
-        career = career.apply(pd.to_numeric, errors='ignore')
-        career.rename(columns={0: self.full_name}, inplace=True)
-        return career
