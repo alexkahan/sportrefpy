@@ -31,7 +31,7 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
     - [MLB](#mlb)
         - [Initialize league, team, or player](#initialize-a-league-team-or-player-2)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-3)
-        - [Compare Franchises]()
+        - [Compare Franchises](#compare-franchise-wl-records-2)
         - [Team-specific Batters Stats](#get-stats-of-batters-for-a-specific-franchise)
         - [Team-specific Pitchers Stats](#get-stats-of-pitchers-for-a-specific-franchise)
         - [Team-specific Manager Stats](#get-stats-of-managers-for-a-specific-franchise)
