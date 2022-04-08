@@ -120,4 +120,4 @@ class MLBFranchise(MLB):
         return seasons
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise}>"
+        return f"<{self.abbreviation} - {self.franchise_name}>"
