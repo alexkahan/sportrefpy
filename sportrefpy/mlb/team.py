@@ -5,8 +5,9 @@ import numpy as np
 class MLBFranchise(MLB):
     def __init__(self, franchise):
         super().__init__()
+        self.franchise = franchise.upper()
         self.abbreviation = franchise
-        self.franchise = self.teams[franchise]['team_name']
+        self.franchise_name = self.teams[franchise]['team_name']
         self.team_url = self.teams[franchise]['url']
         self.batters_url = self.team_url + 'bat.shtml'
         self.pitchers_url = self.team_url + 'pitch.shtml'
