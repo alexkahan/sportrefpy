@@ -435,6 +435,6 @@ standings = mlb.standings(season=2018)
 
 # Just one of them
 al = mlb.al_standings(season=1990)
-nl = mlb.conference_standings()
+nl = mlb.nl_standings()
 ```
 - _season_ defaults to the current season if nothing is provided.
