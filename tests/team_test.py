@@ -8,6 +8,7 @@ from sportrefpy.mlb.team import MLBFranchise
 from sportrefpy.cbb.cbb import CBBSchool
 from sportrefpy.cfb.cfb import CFBSchool
 from sportrefpy.nhl.analysis import compare_franchises as nhl_compare_franchises
+from sportrefpy.mlb.analysis import compare_franchises as mlb_compare_franchises
 
 
 def test_NBA_franchise():
@@ -69,7 +70,7 @@ def test_NFL_coaching():
 
 def test_MLB_franchise():
     dodgers = MLBFranchise('LAD')
-    assert dodgers.franchise == "Los Angeles Dodgers"
+    assert dodgers.franchise_name == "Los Angeles Dodgers"
 
 def test_MLB_seasons():
     nyy = MLBFranchise('NYY')
@@ -90,6 +91,11 @@ def test_MLB_pitchers():
     pirates = MLBFranchise('PIT')
     pitchers = pirates.pitchers_all_time_stats()
     assert pitchers.loc['Jim Bunning', 'L'] == 23
+
+def compare_MLB_franchise():
+    comparison = mlb_compare_franchises(['PHI', 'DET'])
+    assert comparison.loc['Philadelphia Phillies', 'L'] > \
+        comparison.loc['Detroit Tigers', 'L']
 
 
 def test_CBB_school():

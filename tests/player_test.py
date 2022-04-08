@@ -6,6 +6,7 @@ from sportrefpy.nba.player import NBAPlayer
 from sportrefpy.nba.analysis import compare_players
 from sportrefpy.nhl.team import NHLFranchise
 from sportrefpy.mlb.team import MLBFranchise
+from sportrefpy.mlb.player import MLBPlayer
 
 def test_NBA_player_FGA():
     sixers = NBAFranchise('PHI')
@@ -45,7 +46,8 @@ def test_NBA_player_post_season_game_log():
     assert np.isnan(gl.loc[56, 'FG'])
 
 def test_NBA_player_comparison():
-    comparison = compare_players(["Shaquille O'Neal", "Kobe Bryant"], stats=['PTS'])
+    comparison = compare_players(["Shaquille O'Neal", "Kobe Bryant"], 
+                                stats=['PTS'])
     assert comparison.sum()['PTS'] == 73961.0
 
 
@@ -61,7 +63,7 @@ def test_NHL_skaters():
 
 def test_NHL_player():
     panthers = NHLFranchise('FLA')
-    players = panthers.roster()
+    players = panthers.roster(2021)
     assert 'Aleksander Barkov' in players.index
 
 def test_NHL_seasons():
@@ -79,3 +81,20 @@ def test_MLB_pitcher():
     bos = MLBFranchise('BOS')
     pitchers = bos.pitchers_all_time_stats()
     assert pitchers.loc['Dennis Eckersley', 'To'] == 1998
+
+def test_MLB_reg_batting():
+    the_kid = MLBPlayer('Ken Griffey Jr.')
+    assert the_kid.regular_season_batting(2009).loc['G'] == 117
+
+def test_MLB_reg_pitching():
+    sandy = MLBPlayer('Sandy Koufax')
+    assert sandy.regular_season_pitching(1966)['W'] > \
+        sandy.regular_season_pitching(1965)['W']
+
+def test_MLB_reg_fielding():
+    cal = MLBPlayer('Cal Ripken Jr.')
+    assert len(cal.regular_season_fielding(1996)) == 2
+
+def test_MLB_career_totals():
+    rog = MLBPlayer('Roger Clemens')
+    assert len(rog.career_totals_pitching()) == 30
