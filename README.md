@@ -27,14 +27,17 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
     - [NFL](#nfl)
 	    - [Initialize a league, team, or player](#initialize-a-league-team-or-player-2)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-2)
+        - [Compare Franchises](#compare-franchise-wl-records-2)
+        - [Roster](#get-roster-for-a-given-season-2)
         - [Conference Standings](#get-conference-standings-by-season)
     - [MLB](#mlb)
         - [Initialize league, team, or player](#initialize-a-league-team-or-player-2)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-3)
-        - [Compare Franchises](#compare-franchise-wl-records-2)
+        - [Compare Franchises](#compare-franchise-wl-records-3)
         - [Team-specific Batters Stats](#get-stats-of-batters-for-a-specific-franchise)
         - [Team-specific Pitchers Stats](#get-stats-of-pitchers-for-a-specific-franchise)
         - [Team-specific Manager Stats](#get-stats-of-managers-for-a-specific-franchise)
+        - [Roster](#get-roster-for-a-given-season-3)
         - [Standings](#get-league-and-conference-standings-by-year)
     - [Saving Data](#saving-data)
 
@@ -265,6 +268,23 @@ from sportrefpy.nfl.league import NFL
 nfl = NFL()
 nfl.franchise_codes()
 ```
+
+### Compare Franchise W/L records
+```python
+from sportrefpy.nfl.analysis import compare_franchises
+
+compare_franchises(['RAI', 'NYG'])
+```
+- must be a list of teams, even if only using 1.
+
+### Get roster for a given season
+```python
+from sportrefpy.nfl.team import NFLFranchise
+
+titans = NFLFranchise('OTI')
+titans.roster(2012)
+```
+- use integer year that season ends in. This example returns the 2011-12 Tennessee Titans.
 
 ### Get conference standings by season
 ```python
