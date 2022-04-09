@@ -1,5 +1,8 @@
+from xml.dom.pulldom import IGNORABLE_WHITESPACE
+import requests
 import pandas as pd
 import numpy as np
+from bs4 import BeautifulSoup, Comment
 
 from sportrefpy.nfl.league import NFL
 
@@ -8,7 +11,7 @@ class NFLFranchise(NFL):
     def __init__(self, franchise):
         super().__init__()
         self.abbreviation = franchise.upper()
-        self.franchise = self.teams[franchise.lower()]['team_name']
+        self.franchise_name = self.teams[franchise.lower()]['team_name']
         self.team_url = self.teams[franchise.lower()]['url']
         self.coaches_url = f'{self.team_url}coaches.htm'
     
@@ -45,25 +48,34 @@ class NFLFranchise(NFL):
         return coaches
 
 
-    # def roster(self, year=None):
-    #     '''
-    #     Returns Pandas dataframe of current roster.
-    #     '''
-    #     roster_url = f'{self.team_url}{str(year)}_roster.htm'
-    #     r = requests.get(roster_url)
-    #     soup = BeautifulSoup(r.content, 'html.parser')
-
-    #     for comment in soup.find_all(text=lambda text: isinstance(text, Comment)):
-    #         if comment.find("<table ") > 0:
-    #             comment_soup = BeautifulSoup(comment, 'html.parser')
-    #             table = comment_soup.find("table")
-    #             print(table.string)
-        
-
-        # roster = roster[roster['Player']!= 'Player']
-        # roster.set_index('Player', inplace=True)
-        # roster['Yrs'] = roster['Years'].replace('Rook', 0)
-        # return roster
+    def roster(self, year=None):
+        '''
+        Returns Pandas dataframe of current roster.
+        '''
+        if year is not None:
+            roster_url = f'{self.team_url}{str(year)}_roster.htm'
+            response = requests.get(roster_url)
+            soup = BeautifulSoup(response.text, features='lxml')
+            comments = soup.find_all(string=lambda text:isinstance(text, Comment))
+            tables = []
+            for comment in comments:
+                if 'roster' in str(comment):
+                    try:
+                        tables.append(pd.read_html(str(comment)))
+                    except:
+                        continue
+            roster = tables[0][0]
+            roster = roster[~roster['Player'].str.contains('Player|Team Total')]
+            roster.set_index('Player', inplace=True)
+            roster['Yrs'] = roster['Yrs'].replace('Rook', 0)
+            roster.drop(columns={'AV'}, inplace=True)
+            roster.rename(columns={
+                'College/Univ': 'College', 
+                'Drafted (tm/rnd/yr)': 'Draft'}
+                , inplace=True)
+            roster['Draft'].fillna('Undrafted', inplace=True)
+            return roster
+        return None
 
     
     def season_history(self):
@@ -74,7 +86,7 @@ class NFLFranchise(NFL):
         seasons = pd.read_html(self.team_url, header=[1])[0]
         seasons = seasons[seasons['Tm'] != 'Tm']
         seasons = seasons[seasons['T/G'] != 'Overall Rank']
-        seasons['Year'] = seasons['Year'].astype(int)
+        seasons = seasons.apply(pd.to_numeric, errors='ignore')
         seasons.rename(columns={
             'Coaches': 'Head Coach',
             'AV': 'Top Approximate Value',
@@ -86,9 +98,8 @@ class NFLFranchise(NFL):
         seasons.drop(columns={'Tm', 'Pts', 'Yds', 'Yds.1', 'Pts.1', 'Pts±',
                             'Yds±', 'out of', 'MoV', 'SoS', 'SRS', 'OSRS', 
                             'DSRS'}, inplace=True)
-
         return seasons
         
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise}>"
+        return f"<{self.abbreviation} - {self.franchise_name}>"
