@@ -55,7 +55,7 @@ def test_NHL_franchise_comparison():
 
 def test_NFL_franchise():
     kc = NFLFranchise('kan')
-    assert kc.franchise == "Kansas City Chiefs"
+    assert kc.franchise_name == "Kansas City Chiefs"
 
 def test_NFL_seasons():
     eagles = NFLFranchise('PHI')
