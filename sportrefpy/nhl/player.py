@@ -14,8 +14,8 @@ class NHLPlayer(NHL):
     def __init__(self, player):
         super().__init__()\
 
-        player_dict = enchant.PyPWL(os.path.dirname\
-            (os.path.dirname(__file__)) + '\\assets\\nhl_players.txt')
+        player_dict = enchant.PyPWL(os.path.dirname
+                                    (os.path.dirname(__file__)) + '\\assets\\nhl_players.txt')
         first_letter = player.split()[-1][0].lower()
         with open(os.path.dirname(os.path.dirname(__file__)) + '\\assets\\nhl_players.txt', 'r') as player_dict:
             if player in player_dict.read():
@@ -36,7 +36,6 @@ Player names are case-sensitive.'''
 Player names are case-sensitive.'''
                 raise PlayerNotFound(message)
 
-    
     def regular_season_stats(self):
         '''
         Returns a players regular seasons stats by season or by career.
@@ -44,11 +43,11 @@ Player names are case-sensitive.'''
         It can show stats per year in total or by team, 
         if they played for multiple.
         '''
-    
+
         stats = pd.read_html(self.player_url, header=[1])[0]
-        stats.columns = ['Season', 'Age', 'Tm', 'Lg', 'GP', 'G', 'A', 'PTS', \
-            '+/-', 'PIM', 'EVG', 'PPG', 'SHG', 'GWG', 'EVA', 'PPA', 'SHA', \
-            'S', 'S%', 'TOI', 'ATOI', 'Awards']
+        stats.columns = ['Season', 'Age', 'Tm', 'Lg', 'GP', 'G', 'A', 'PTS',
+                         '+/-', 'PIM', 'EVG', 'PPG', 'SHG', 'GWG', 'EVA', 'PPA', 'SHA',
+                         'S', 'S%', 'TOI', 'ATOI', 'Awards']
         stats = stats[~stats['Season'].str.contains('season|Career|yr|yrs')]
         stats.set_index('Season', inplace=True)
         stats = stats[stats['Lg'] == 'NHL']

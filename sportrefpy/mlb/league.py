@@ -3,7 +3,8 @@ from datetime import datetime
 from bs4 import BeautifulSoup, Comment
 import pandas as pd
 
-class MLB:   
+
+class MLB:
 
     def __init__(self):
         self.url = 'https://www.baseball-reference.com'
@@ -21,7 +22,7 @@ class MLB:
                 "team_name": item.text,
                 "abbrev": item.find('a')['href'].split('/')[-2],
                 "url": self.url + item.find('a')['href'],
-            }  
+            }
 
     def franchise_codes(self):
         '''
@@ -30,19 +31,19 @@ class MLB:
         for abbrev, team_name in self.teams.items():
             print(f"{abbrev} ({team_name['team_name']})")
 
-    
     def standings(self, season=None):
         '''
         Season will be current year if it's not specified. Overall standings.
         '''
 
         if season is None:
-            season=self.current_season_year
+            season = self.current_season_year
 
-        page = requests.get(f'{self.url}/leagues/majors/{str(season)}-standings.shtml')
+        page = requests.get(
+            f'{self.url}/leagues/majors/{str(season)}-standings.shtml')
         soup = BeautifulSoup(page.text, 'html.parser')
 
-        comments = soup.find_all(string=lambda text:isinstance(text, Comment))
+        comments = soup.find_all(string=lambda text: isinstance(text, Comment))
 
         tables = []
         for comment in comments:
@@ -62,12 +63,13 @@ class MLB:
     def al_standings(self, season=None):
 
         if season is None:
-            season=self.current_season_year
+            season = self.current_season_year
 
-        page = requests.get(f'{self.url}/leagues/AL/{str(season)}-standings.shtml').text
+        page = requests.get(
+            f'{self.url}/leagues/AL/{str(season)}-standings.shtml').text
         soup = BeautifulSoup(page, 'html.parser')
 
-        comments = soup.find_all(string=lambda text:isinstance(text, Comment))
+        comments = soup.find_all(string=lambda text: isinstance(text, Comment))
 
         tables = []
         for comment in comments:
@@ -87,12 +89,13 @@ class MLB:
     def nl_standings(self, season=None):
 
         if season is None:
-            season=self.current_season_year
+            season = self.current_season_year
 
-        page = requests.get(f'{self.url}/leagues/NL/{str(season)}-standings.shtml').text
+        page = requests.get(
+            f'{self.url}/leagues/NL/{str(season)}-standings.shtml').text
         soup = BeautifulSoup(page, 'html.parser')
 
-        comments = soup.find_all(string=lambda text:isinstance(text, Comment))
+        comments = soup.find_all(string=lambda text: isinstance(text, Comment))
 
         tables = []
         for comment in comments:

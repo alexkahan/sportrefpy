@@ -2,6 +2,7 @@ import pandas as pd
 from sportrefpy.mlb.league import MLB
 import numpy as np
 
+
 class MLBFranchise(MLB):
     def __init__(self, franchise):
         super().__init__()
@@ -14,7 +15,6 @@ class MLBFranchise(MLB):
         self.managers_url = self.team_url + 'managers.shtml'
         self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
 
-    
     def batters_all_time_stats(self, batter=None):
         '''
         Returns Pandas dataframe of all historical player data.
@@ -34,7 +34,7 @@ class MLBFranchise(MLB):
                 return batters.loc[batter]
             except KeyError:
                 return 'Player not found.'
-        
+
         return batters
 
     def pitchers_all_time_stats(self, pitcher=None):
@@ -55,7 +55,7 @@ class MLBFranchise(MLB):
                 return pitchers.loc[pitcher]
             except KeyError:
                 return 'Player not found.'
-        
+
         return pitchers
 
     def managers_all_time_stats(self, manager=None):
@@ -79,13 +79,12 @@ class MLBFranchise(MLB):
 
         return managers
 
-
     def roster(self, season=None):
         '''
         Returns Pandas dataframe of roster for a given year.
         '''
         roster_url = f'{self.team_url}{str(season)}-roster.shtml'
-        roster = pd.read_html(roster_url ,attrs={'id': 'appearances'})[0]
+        roster = pd.read_html(roster_url, attrs={'id': 'appearances'})[0]
         roster['Name'] = roster['Name'].apply(lambda x: x.split(' HOF')[0])
         roster = roster[roster['Name'] != 'Name']
         roster.set_index('Name', inplace=True)
@@ -95,7 +94,6 @@ class MLBFranchise(MLB):
 
         return roster
 
-    
     def season_history(self, year=None):
         '''
         Returns Pandas dataframe of seasons.

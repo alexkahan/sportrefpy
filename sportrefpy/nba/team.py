@@ -16,17 +16,16 @@ class NBAFranchise(NBA):
         self.coaches_url = self.team_url + 'coaches.html'
         self.seasons_url = f'{self.url}/teams/{self.abbreviation}'
 
-    
     def players_all_time_stats(self, player=None):
         '''
         Returns Pandas dataframe of all historical player data for that team.
         '''
 
         players = pd.read_html(self.players_url)[0]
-        players.columns = ['Rank', 'Player', 'From', 'To', 'Yrs', 'G', 'MP', \
-            'FG', 'FGA', '3P', '3PA', 'FT', 'FTA', 'ORB', 'TRB', 'AST', \
-            'STL', 'BLK', 'TOV', 'PF', 'PTS', 'FG%', '3P%', 'FT%', 'MPG',\
-            'PPG', 'RBG', 'APG']
+        players.columns = ['Rank', 'Player', 'From', 'To', 'Yrs', 'G', 'MP',
+                           'FG', 'FGA', '3P', '3PA', 'FT', 'FTA', 'ORB', 'TRB',
+                           'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'FG%',
+                           '3P%', 'FT%', 'MPG', 'PPG', 'RBG', 'APG']
         players.dropna(axis='rows', subset='Player', inplace=True)
         players.drop(columns={'Rank'}, inplace=True)
         players = players[players['Player'] != 'Player']
@@ -41,16 +40,16 @@ class NBAFranchise(NBA):
 
         return players
 
-
     def coaches_all_time_data(self, coach=None):
         '''
         Returns Pandas dataframe of all historical coach data.
         '''
 
         coaches = pd.read_html(self.coaches_url)[0]
-        coaches.columns = ['Rank', 'Coach', 'From', 'To', 'Yrs', 'G', 'W', \
-            'L', 'W/L%', 'W > .500', 'Playoffs', 'Playoff G', 'Playoff W', \
-            'Playoff L', 'Playoff W/L%', 'Conf', 'Champ']
+        coaches.columns = ['Rank', 'Coach', 'From', 'To', 'Yrs', 'G', 'W',
+                           'L', 'W/L%', 'W > .500', 'Playoffs', 'Playoff G',
+                           'Playoff W', 'Playoff L', 'Playoff W/L%', 'Conf',
+                           'Champ']
         coaches.dropna(axis='rows', subset='Coach', inplace=True)
         coaches.drop(columns={'Rank'}, inplace=True)
         coaches = coaches[coaches['Coach'] != 'Coach']
@@ -65,7 +64,6 @@ class NBAFranchise(NBA):
 
         return coaches
 
-
     def roster(self, season=None):
         '''
         Returns Pandas dataframe of roster for a given year.
@@ -79,8 +77,8 @@ class NBAFranchise(NBA):
                     break
             roster.drop(columns={'Unnamed: 6'}, inplace=True)
             roster['Exp'] = roster['Exp'].replace('R', 0)
-            roster['Player'] = roster['Player'].apply(lambda \
-                x: x.split('(TW)')[0])
+            roster['Player'] = roster['Player'].apply(lambda
+                                                      x: x.split('(TW)')[0])
             roster.set_index('Player', inplace=True)
             roster['Exp'] = roster['Exp'].apply(lambda x: int(x))
             roster['Birth Date'] = roster['Birth Date']\
@@ -89,7 +87,6 @@ class NBAFranchise(NBA):
         else:
             return None
 
-    
     def season_history(self, year=None):
         '''
         Returns Pandas dataframe of seasons.
@@ -99,8 +96,8 @@ class NBAFranchise(NBA):
         seasons = seasons[seasons['Team'] != 'Team']
         seasons.set_index('Season', inplace=True)
         seasons['Team'] = seasons['Team'].apply(lambda x: x.split('*')[0])
-        seasons.drop(columns={'Unnamed: 8', 'Unnamed: 15'}, 
-                    inplace=True)
+        seasons.drop(columns={'Unnamed: 8', 'Unnamed: 15'},
+                     inplace=True)
 
         if year is not None:
             try:
@@ -109,7 +106,6 @@ class NBAFranchise(NBA):
                 return 'Season not found.'
 
         return seasons
-        
 
     def __repr__(self):
         return f"<{self.abbreviation} - {self.franchise_name}>"

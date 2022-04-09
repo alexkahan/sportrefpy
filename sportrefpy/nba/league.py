@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 
-class NBA:   
+class NBA:
 
     def __init__(self):
         self.url = 'https://www.basketball-reference.com'
@@ -20,7 +20,6 @@ class NBA:
                 "url": self.url + item.find('a')['href'],
             }
 
-
     def franchise_codes(self):
         '''
         Print list of team codes, which are used for getting a specific franchise.
@@ -28,7 +27,6 @@ class NBA:
         for team in self.teams.items():
             print(f"{team[1]['abbrev']} ({team[1]['team_name']})")
 
-    
     def conference_standings(self, conf=None):
         east_conf = pd.read_html(self.standings_url)[-2]
         east_conf.index = east_conf.index + 1
