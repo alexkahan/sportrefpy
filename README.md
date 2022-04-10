@@ -28,10 +28,11 @@ Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sp
 	    - [Initialize a league, team, or player](#initialize-a-league-team-or-player-2)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-2)
         - [Compare Franchises](#compare-franchise-wl-records-2)
+        = [Get NFL award winners (AP MVP, SB Champ, Offensive ROY, etc.)](#get-nfl-award-winners-ap-mvp-sb-champ-offensive-roy-etc)
         - [Roster](#get-roster-for-a-given-season-2)
         - [Conference Standings](#get-conference-standings-by-season)
     - [MLB](#mlb)
-        - [Initialize league, team, or player](#initialize-a-league-team-or-player-2)
+        - [Initialize league, team, or player](#initialize-a-league-team-or-player-3)
         - [Find Franchise Codes](#print-out-franchise-codes-needed-for-initializing-a-team-3)
         - [Compare Franchises](#compare-franchise-wl-records-3)
         - [Team-specific Batters Stats](#get-stats-of-batters-for-a-specific-franchise)
@@ -261,6 +262,17 @@ seasons[seasons['Playoffs']  == 'Won Stanley Cup Final']]
 
 ## NFL
 
+### Initialize a league, team, or player
+```python
+from sportrefpy.nfl.league import NFL
+from sportrefpy.nfl.team import NFLFranchise
+from sportrefpy.nfl.player import NFLPlayer
+
+nfl = NFL()
+saints = NFLFranchise('nor')
+tb12 = NFLPlayer('Tom Brady')
+```
+
 ### Print out Franchise Codes (needed for initializing a team)
 ```python
 from sportrefpy.nfl.league import NFL
@@ -276,6 +288,15 @@ from sportrefpy.nfl.analysis import compare_franchises
 compare_franchises(['RAI', 'NYG'])
 ```
 - must be a list of teams, even if only using 1.
+
+### Get NFL award winners (AP MVP, SB Champ, Offensive ROY, etc.)
+```python
+from sportrefpy.nfl.league import NFL
+
+nfl = NFL()
+
+nfl.season_leaders()
+```
 
 ### Get roster for a given season
 ```python
