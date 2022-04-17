@@ -11,10 +11,14 @@ def all_players():
         franchise = NHLFranchise(team)
         players.update(franchise.skaters_all_time_stats().index)
         players.update(franchise.goalies_all_time_stats().index)
-    with open(os.path.dirname(os.path.dirname(__file__)) + '\\assets\\nhl_players.txt', 'w', encoding='ascii') as file:
+    with open(
+        os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nhl_players.txt",
+        "w",
+        encoding="ascii",
+    ) as file:
         for player in players:
             try:
-                player = player.replace('*', '')
-                file.write(f'{player}\n')
+                player = player.replace("*", "")
+                file.write(f"{player}\n")
             except UnicodeEncodeError:
                 continue

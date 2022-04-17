@@ -14,18 +14,18 @@ class NFLPlayer(NFL):
     def __init__(self, player):
         super().__init__()
 
-        player_dict = enchant.PyPWL(os.path.dirname
-                                    (os.path.dirname(__file__)) + '\\assets\\nfl_players.txt')
+        player_dict = enchant.PyPWL(
+            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nfl_players.txt"
+        )
         first_letter_last_name = player.split()[1][0].upper()
-        response = requests.get(
-            self.url + f'/players/{first_letter_last_name}')
-        soup = BeautifulSoup(response.text, features='lxml')
-        players = soup.find('div', attrs={'id': 'div_players'})
+        response = requests.get(self.url + f"/players/{first_letter_last_name}")
+        soup = BeautifulSoup(response.text, features="lxml")
+        players = soup.find("div", attrs={"id": "div_players"})
         if player in players.text:
             for choice in players:
                 if player in choice.text:
                     self.full_name = player
-                    self.player_url = self.url + choice.find('a')['href']
+                    self.player_url = self.url + choice.find("a")["href"]
                     # response = requests.get(self.player_url)
                     # soup = BeautifulSoup(response.text, features='lxml')
                     # self.pitcher = True if 'Pitcher' in \
@@ -43,12 +43,12 @@ class NFLPlayer(NFL):
         else:
             try:
                 suggestion = player_dict.suggest(player)[0]
-                message = f'''<{player}> not found. 
+                message = f"""<{player}> not found. 
 Is it possible you meant {suggestion}?
-Player names are case-sensitive.'''
+Player names are case-sensitive."""
             except:
-                message = f'''<{player}> not found.
-Player names are case-sensitive.'''
+                message = f"""<{player}> not found.
+Player names are case-sensitive."""
             raise PlayerNotFound(message)
 
     # def regular_season_batting(self, season=None, stat=None):
