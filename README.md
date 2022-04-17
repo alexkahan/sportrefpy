@@ -1,5 +1,5 @@
 # SPORTREFPY
-Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sports-reference.com/) family of sites. Currently, only the NBA, NHL, and MLB are working but NFL and College Basketball/Football will be supported as soon as possible.
+Sportrefpy is package that pulls data from the [Sports-Reference](https://www.sports-reference.com/) family of sites. Currently, only the NBA, NFL, NHL, and MLB. College Basketball/Football will be supported as soon as possible.
 
 # Table of Contents
 - [Installation](#installation)
