@@ -18,10 +18,15 @@ def all_players():
         for item in items
         if "-index.html" in item.find("a")["href"]
     ]
-    print(letters)
-    # with open(os.path.dirname(os.path.dirname(__file__)) + '\\assets\\cbb_players.txt', 'w', encoding='ascii') as file:
-    #     for player in players:
-    #         try:
-    #             file.write(f'{player}\n')
-    #         ex vcept UnicodeEncodeError:
-    #             continue
+    with open(os.path.dirname(os.path.dirname(__file__)) + '\\assets\\cbb_players.txt', 'a', encoding='ascii') as file:
+        for i in letters:
+            response = requests.get(f'https://www.sports-reference.com{i}')
+            soup = BeautifulSoup(response.text, features="lxml")
+            items = soup.find_all('p')
+            for item in items:
+                if '(' in item.text and ')' in item.text:
+                    try:
+                        player = item.text.split('(')[0]
+                        file.write(f'{player}\n')
+                    except UnicodeEncodeError:
+                        continue
