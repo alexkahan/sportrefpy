@@ -5,7 +5,6 @@ from sportrefpy.nba.analysis import compare_franchises as nba_compare_franchises
 from sportrefpy.nhl.team import NHLFranchise
 from sportrefpy.nfl.team import NFLFranchise
 from sportrefpy.mlb.team import MLBFranchise
-from sportrefpy.cbb.cbb import CBBSchool
 from sportrefpy.cfb.cfb import CFBSchool
 from sportrefpy.nhl.analysis import compare_franchises as nhl_compare_franchises
 from sportrefpy.mlb.analysis import compare_franchises as mlb_compare_franchises
