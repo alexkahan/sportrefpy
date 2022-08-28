@@ -3,32 +3,23 @@ from datetime import datetime
 from bs4 import BeautifulSoup, Comment
 import pandas as pd
 
+from sportrefpy.enums import SportURLs, NumTeams
+from sportrefpy.league.league import League
 
-class MLB:
+
+class MLB(League):
     def __init__(self):
-        self.url = "https://www.baseball-reference.com"
-        self.teams = {}
+        super().__init__()
+        self._num_teams = NumTeams.MLB
+        self.url = SportURLs.MLB.value
+        self.response = requests.get(f"{self.url}/teams")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"data-stat": "franchise_name"}
+        self.teams = self.get_teams()
         if datetime.today().month >= 4:
             self.current_season_year = datetime.today().year
         else:
             self.current_season_year = datetime.today().year - 1
-
-        response = requests.get(self.url + "/teams")
-        soup = BeautifulSoup(response.text, features="lxml")
-
-        for item in soup.find_all(attrs={"data-stat": "franchise_name"})[1:31]:
-            self.teams[item.find("a")["href"].split("/")[-2]] = {
-                "team_name": item.text,
-                "abbrev": item.find("a")["href"].split("/")[-2],
-                "url": self.url + item.find("a")["href"],
-            }
-
-    def franchise_codes(self):
-        """
-        Print list of team codes, which are used for getting a specific franchise.
-        """
-        for abbrev, team_name in self.teams.items():
-            print(f"{abbrev} ({team_name['team_name']})")
 
     def standings(self, season=None):
         """

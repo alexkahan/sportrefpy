@@ -7,7 +7,7 @@ setup(
     name="sportrefpy",
     author="alex kahan",
     author_email="kahanscious@gmail.com",
-    version="0.3.0",
+    version="1.0.0",
     description="Python package to pull sports stats from all major sports leagues.",
     long_description=long_description,
     long_description_content_type="text/markdown",

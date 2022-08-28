@@ -2,29 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+from sportrefpy.league.league import League
+from sportrefpy.enums import NumTeams, SportURLs
 
-class NHL:
+
+class NHL(League):
     def __init__(self):
-        self.url = "https://www.hockey-reference.com"
-        self.teams = {}
-        self.standings_url = self.url + "/boxscores/"
-
-        response = requests.get(self.url + "/teams")
-        soup = BeautifulSoup(response.text, features="lxml")
-
-        for item in soup.find_all(attrs={"data-stat": "franch_name"})[1:33]:
-            self.teams[item.find("a")["href"].split("/")[-2]] = {
-                "team_name": item.text,
-                "abbrev": item.find("a")["href"].split("/")[-2],
-                "url": self.url + item.find("a")["href"],
-            }
-
-    def franchise_codes(self):
-        """
-        Print list of team codes, which are used for getting a specific franchise.
-        """
-        for abbrev, team_name in self.teams.items():
-            print(f"{abbrev} ({team_name['team_name']})")
+        super().__init__()
+        self._num_teams = NumTeams.NHL
+        self.url = SportURLs.NHL.value
+        self.standings_url = f"{self.url}/boxscores/"
+        self.response = requests.get(f"{self.url}/teams")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"data-stat": "franch_name"}
+        self.teams = self.get_teams()
 
     def conference_standings(self, conf=None):
         # Eastern Conference
