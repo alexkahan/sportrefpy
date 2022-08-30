@@ -1,14 +1,17 @@
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 
-from sportrefpy.league.league import League
-from sportrefpy.enums import NumTeams, SportURLs
+from sportrefpy.sport.sport import Sport
+from sportrefpy.util.enums import NumTeams
+from sportrefpy.util.enums import SportEnum
+from sportrefpy.util.enums import SportURLs
 
 
-class NHL(League):
+class NHL(Sport):
     def __init__(self):
         super().__init__()
+        self._name = SportEnum.NHL.value
         self._num_teams = NumTeams.NHL
         self.url = SportURLs.NHL.value
         self.standings_url = f"{self.url}/boxscores/"

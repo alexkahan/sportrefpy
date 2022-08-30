@@ -1,6 +1,15 @@
 import enum
 
 
+class SportEnum(enum.Enum):
+    NBA = "NBA"
+    NHL = "NHL"
+    NFL = "NFL"
+    MLB = "MLB"
+    CBB = "CBB"
+    CFB = "CFB"
+
+
 class NumTeams(enum.IntEnum):
     NBA = 30
     NHL = 32

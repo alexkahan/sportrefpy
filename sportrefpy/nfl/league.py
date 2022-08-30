@@ -1,15 +1,19 @@
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
 from datetime import datetime
 
-from sportrefpy.league.league import League
-from sportrefpy.enums import NumTeams, SportURLs
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+from sportrefpy.sport.sport import Sport
+from sportrefpy.util.enums import NumTeams
+from sportrefpy.util.enums import SportEnum
+from sportrefpy.util.enums import SportURLs
 
 
-class NFL(League):
+class NFL(Sport):
     def __init__(self):
         super().__init__()
+        self._name = SportEnum.NFL.value
         self._num_teams = NumTeams.NFL
         self.url = SportURLs.NFL.value
         self.response = requests.get(f"{self.url}/teams")

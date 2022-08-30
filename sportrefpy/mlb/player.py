@@ -1,25 +1,25 @@
-import requests
 import os
 
-from bs4 import BeautifulSoup, Comment
-import pandas as pd
-import numpy as np
 import enchant
+import numpy as np
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from bs4 import Comment
 
-from sportrefpy.mlb.league import MLB
 from sportrefpy.errors.not_found import PlayerNotFound
+from sportrefpy.mlb.league import MLB
+from sportrefpy.player.player import Player
 
 
-class MLBPlayer(MLB):
+class MLBPlayer(Player):
     def __init__(self, player):
         super().__init__()
-
-        player_dict = enchant.PyPWL(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nba_players.txt"
-        )
-        first_letter_last_name = player.split()[1][0].lower()
-        response = requests.get(self.url + f"/players/{first_letter_last_name}")
-        soup = BeautifulSoup(response.text, features="lxml")
+        self.player_dict = self.get_player_dict("mlb")
+        self.identifying_letter = player.split()[1][0].lower()
+        self.response = requests.get(self.url + f"/players/{self.identifying_letter}")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"id": "div_players_"}
         players = soup.find("div", attrs={"id": "div_players_"})
         if player in players.text:
             for choice in players:
@@ -48,7 +48,7 @@ class MLBPlayer(MLB):
         else:
             try:
                 suggestion = player_dict.suggest(player)[0]
-                message = f"""<{player}> not found. 
+                message = f"""<{player}> not found.
 Is it possible you meant {suggestion}?
 Player names are case-sensitive."""
             except:

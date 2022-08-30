@@ -1,13 +1,12 @@
-import requests
 import os
 
-from bs4 import BeautifulSoup
-import pandas as pd
-import numpy as np
 import enchant
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
-from sportrefpy.nhl.league import NHL
 from sportrefpy.errors.not_found import PlayerNotFound
+from sportrefpy.nhl.league import NHL
 
 
 class NHLPlayer(NHL):
@@ -31,7 +30,7 @@ class NHLPlayer(NHL):
             else:
                 try:
                     suggestion = player_dict.suggest(player)[0]
-                    message = f"""<{player}> not found. 
+                    message = f"""<{player}> not found.
 Is it possible you meant {suggestion}?
 Player names are case-sensitive."""
                 except:

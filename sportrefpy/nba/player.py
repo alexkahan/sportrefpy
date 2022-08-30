@@ -1,56 +1,82 @@
-import requests
-import os
-
-from bs4 import BeautifulSoup
-import pandas as pd
 import numpy as np
-import enchant
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from numpy.typing import DTypeLike
+from requests import Response
 
 from sportrefpy.nba.league import NBA
-from sportrefpy.errors.not_found import PlayerNotFound
+from sportrefpy.player.player import Player
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.player_dictionary import PlayerDictionary
 
 
-class NBAPlayer(NBA):
-    def __init__(self, player):
-        super().__init__()
+class NBAPlayer(Player):
+    def __init__(self, name):
+        super().__init__(name)
+        if not self.is_valid_player():
+            PlayerDictionary.make_suggestion(NBA().player_dict, name)
+        self.full_name: str = name
 
-        player_dict = enchant.PyPWL(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nba_players.txt"
-        )
-        first_letter = player.split()[-1][0].lower()
-        players = pd.read_html(self.url + f"/players/{first_letter}")[0]
+    @property
+    def identifying_letter(self) -> str:
+        return self.name.split()[-1][0].lower()
+
+    @property
+    def players(self) -> DTypeLike:
+        players = pd.read_html(
+            SportURLs.NBA.value + f"/players/{self.identifying_letter}"
+        )[0]
         players["Player"] = players["Player"].apply(lambda x: x.split("*")[0])
-        if player in players["Player"].values:
-            response = requests.get(self.url + f"/players/{first_letter}")
-            soup = BeautifulSoup(response.text, features="lxml")
-            for item in soup.find_all("th", attrs={"class": "left"}):
-                if player in item.text:
-                    self.player_url = self.url + item.find("a")["href"]
-                    response = requests.get(self.player_url)
-                    soup = BeautifulSoup(response.text, features="lxml")
-                    self.game_log_url = self.player_url.replace(".html", "/gamelog/")
-                    if soup.find_all(
-                        "div", attrs={"id": "switcher_per_game-playoffs_per_game"}
-                    ):
-                        self.playoffs = True
-                        self.playoff_url = self.game_log_url.replace(
-                            "gamelog", "gamelog-playoffs"
-                        )
-                    else:
-                        self.playoffs = False
-                self.full_name = player
-        else:
-            try:
-                suggestion = player_dict.suggest(player)[0]
-                message = f"""<{player}> not found. 
-Is it possible you meant {suggestion}?
-Player names are case-sensitive."""
-            except:
-                message = f"""<{player}> not found.
-Player names are case-sensitive."""
-            raise PlayerNotFound(message)
+        return players["Player"].values
 
-    def regular_season_stats(self):
+    @property
+    def player_url(self):
+        for item in self.soup.find_all("th", attrs={"class": "left"}):
+            if self.name in item.text:
+                return f"{SportURLs.NBA.value}{item.find('a')['href']}"
+        return None
+
+    @property
+    def response(self) -> Response:
+        return requests.get(f"{SportURLs.NBA.value}/players/{self.identifying_letter}")
+
+    @property
+    def soup(self) -> BeautifulSoup:
+        return BeautifulSoup(self.response.text, features="lxml")
+
+    @property
+    def player_response(self) -> Response:
+        return requests.get(self.player_url)
+
+    @property
+    def player_soup(self) -> BeautifulSoup:
+        return BeautifulSoup(self.player_response.text, features="lxml")
+
+    @property
+    def game_log_url(self):
+        return self.player_url.replace(".html", "/gamelog/")
+
+    @property
+    def playoffs(self) -> bool:
+        if self.player_soup.find_all(
+            "div", attrs={"id": "switcher_per_game-playoffs_per_game"}
+        ):
+            return True
+        return False
+
+    @property
+    def playoff_url(self):
+        if self.playoffs:
+            return self.game_log_url.replace("gamelog", "gamelog-playoffs")
+        return None
+
+    def is_valid_player(self) -> bool:
+        if self.name in self.players:
+            return True
+        return False
+
+    def regular_season_stats(self) -> pd.DataFrame:
         """
         Returns a players regular seasons stats by season or by career.
 
@@ -58,7 +84,7 @@ Player names are case-sensitive."""
         if they played for multiple.
         """
 
-        if self.playoffs == True:
+        if self.playoffs:
             stats = pd.read_html(self.player_url)[2]
             stats.drop(columns={"Unnamed: 30"}, inplace=True)
         else:
@@ -69,7 +95,7 @@ Player names are case-sensitive."""
 
         return stats
 
-    def post_season_stats(self):
+    def post_season_stats(self) -> pd.DataFrame:
         """
         Returns a players postseason seasons stats (if applicable)
         by season or by career.
@@ -90,9 +116,8 @@ Player names are case-sensitive."""
 
             return stats
 
-    def reg_season_game_log(self, season=None):
-        if season:
-            year = str(1 + int(season.split("-")[0]))
+    def reg_season_game_log(self, season) -> pd.Series:
+        year = str(1 + int(season.split("-")[0]))
         games = pd.read_html(self.game_log_url + year)[-1]
         games.drop(columns=(["G", "Unnamed: 5"]), inplace=True)
         games.rename(
@@ -109,7 +134,7 @@ Player names are case-sensitive."""
 
         return games
 
-    def post_season_game_log(self):
+    def post_season_game_log(self) -> pd.Series:
         if self.playoffs:
             playoffs = pd.read_html(self.playoff_url)[-1]
             playoffs.drop(columns=(["G", "Unnamed: 5"]), inplace=True)
@@ -132,7 +157,7 @@ Player names are case-sensitive."""
         else:
             return None
 
-    def career_totals(self, stat=None):
+    def career_totals(self, stat=None) -> pd.Series:
         """
         Find player totals (includes regular and post season)
         """

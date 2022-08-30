@@ -1,17 +1,29 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+
+from sportrefpy.util.player_dictionary import PlayerDictionary
 
 
-class League(ABC):
+class Sport(ABC):
     def __init__(self):
+        self._name = None
         self._num_teams = None
         self.url = None
         self.response = None
         self.soup = None
         self.soup_attrs = None
+        self.teams = None
 
-    def get_teams(self):
+    @property
+    def player_dict(self):
+        return PlayerDictionary.get_player_dictionary(self._name)
+
+    @property
+    def players(self):
+        raise NotImplementedError
+
+    def get_teams(self) -> dict:
         teams = dict()
-        for item in self.soup.find_all(attrs=self.soup_attrs)[1:self._num_teams + 1]:
+        for item in self.soup.find_all(attrs=self.soup_attrs)[1 : self._num_teams + 1]:
             teams[item.find("a")["href"].split("/")[-2]] = {
                 "team_name": item.text,
                 "abbrev": item.find("a")["href"].split("/")[-2],
@@ -20,6 +32,6 @@ class League(ABC):
 
         return teams
 
-    def franchise_codes(self):
+    def franchise_codes(self) -> None:
         for abbrev, team_name in self.teams.items():
             print(f"{abbrev} ({team_name['team_name']})")
