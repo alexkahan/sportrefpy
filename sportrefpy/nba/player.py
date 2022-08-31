@@ -14,7 +14,7 @@ from sportrefpy.util.player_dictionary import PlayerDictionary
 class NBAPlayer(Player):
     def __init__(self, name):
         super().__init__(name)
-        if not self.is_valid_player():
+        if not self.is_valid_player:
             PlayerDictionary.make_suggestion(NBA().player_dict, name)
         self.full_name: str = name
 
@@ -42,10 +42,6 @@ class NBAPlayer(Player):
         return requests.get(f"{SportURLs.NBA.value}/players/{self.identifying_letter}")
 
     @property
-    def soup(self) -> BeautifulSoup:
-        return BeautifulSoup(self.response.text, features="lxml")
-
-    @property
     def player_response(self) -> Response:
         return requests.get(self.player_url)
 
@@ -71,10 +67,9 @@ class NBAPlayer(Player):
             return self.game_log_url.replace("gamelog", "gamelog-playoffs")
         return None
 
+    @property
     def is_valid_player(self) -> bool:
-        if self.name in self.players:
-            return True
-        return False
+        return self.name in self.players
 
     def regular_season_stats(self) -> pd.DataFrame:
         """

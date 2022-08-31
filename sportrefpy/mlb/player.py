@@ -1,73 +1,85 @@
-import os
-
-import enchant
-import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from bs4 import Comment
+from requests import Response
 
-from sportrefpy.errors.not_found import PlayerNotFound
 from sportrefpy.mlb.league import MLB
 from sportrefpy.player.player import Player
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.player_dictionary import PlayerDictionary
 
 
 class MLBPlayer(Player):
-    def __init__(self, player):
-        super().__init__()
-        self.player_dict = self.get_player_dict("mlb")
-        self.identifying_letter = player.split()[1][0].lower()
-        self.response = requests.get(self.url + f"/players/{self.identifying_letter}")
-        self.soup = BeautifulSoup(self.response.text, features="lxml")
-        self.soup_attrs = {"id": "div_players_"}
-        players = soup.find("div", attrs={"id": "div_players_"})
-        if player in players.text:
-            for choice in players:
-                if player in choice.text:
-                    self.full_name = player
-                    self.player_url = self.url + choice.find("a")["href"]
-                    response = requests.get(self.player_url)
-                    soup = BeautifulSoup(response.text, features="lxml")
-                    self.pitcher = (
-                        True if "Pitcher" in soup.find_all("p")[0].text else False
-                    )
-                    comments = soup.find_all(
-                        string=lambda text: isinstance(text, Comment)
-                    )
-                    tables = []
-                    for comment in comments:
-                        if "batting_postseason" in str(
-                            comment
-                        ) or "pitching_postseason" in str(comment):
-                            tables.append(str(comment))
-                    if tables:
-                        self.playoffs = True
-                    else:
-                        self.playoffs = False
+    @property
+    def identifying_letter(self):
+        return self.name.split()[1][0].lower()
 
+    @property
+    def players(self):
+        return self.soup.find("div", attrs={"id": "div_players_"})
+
+    @property
+    def player_url(self):
+        for choice in self.players:
+            if self.name in choice.text:
+                return f"{SportURLs.MLB.value}{choice.find('a')['href']}"
+
+    @property
+    def response(self):
+        return requests.get(f"{SportURLs.MLB.value}/players/{self.identifying_letter}")
+
+    @property
+    def player_response(self) -> Response:
+        return requests.get(self.player_url)
+
+    @property
+    def player_soup(self) -> BeautifulSoup:
+        return BeautifulSoup(self.player_response.text, features="lxml")
+
+    @property
+    def is_pitcher(self) -> bool:
+        return "Pitcher" in self.player_soup.find_all("p")[0].text
+
+    @property
+    def playoffs(self):
+        comments = self.player_soup.find_all(
+            string=lambda text: isinstance(text, Comment)
+        )
+        tables = []
+        for comment in comments:
+            if "batting_postseason" in str(comment) or "pitching_postseason" in str(
+                comment
+            ):
+                tables.append(str(comment))
+        if tables:
+            return True
         else:
-            try:
-                suggestion = player_dict.suggest(player)[0]
-                message = f"""<{player}> not found.
-Is it possible you meant {suggestion}?
-Player names are case-sensitive."""
-            except:
-                message = f"""<{player}> not found.
-Player names are case-sensitive."""
-            raise PlayerNotFound(message)
+            return False
+
+    @property
+    def is_valid_player(self):
+        return self.name in self.players.text
+
+    def __init__(self, name):
+        super().__init__(name)
+        if not self.is_valid_player:
+            PlayerDictionary.make_suggestion(MLB().player_dict, name)
+        self.full_name: str = name
+        # self.soup_attrs = {"id": "div_players_"}
 
     def regular_season_batting(self, season=None, stat=None):
         """
         Returns a players regular seasons batting stats by career.
         """
-        if not self.pitcher:
+        if not self.is_pitcher:
             batting = pd.read_html(self.player_url, attrs={"id": "batting_standard"})[0]
             batting.dropna(how="any", axis="rows", subset="Year", inplace=True)
             batting = batting[~batting["Year"].str.contains("Yrs|yrs|yr|Avg")]
             batting = batting[batting["Lg"].str.contains("NL|AL|MLB")]
             batting = batting.apply(pd.to_numeric, errors="ignore")
             batting.set_index("Year", inplace=True)
-        elif self.pitcher:
+        elif self.is_pitcher:
             response = requests.get(self.player_url)
             soup = BeautifulSoup(response.text, features="lxml")
             comments = soup.find_all(string=lambda text: isinstance(text, Comment))
@@ -96,7 +108,7 @@ Player names are case-sensitive."""
         """
         Returns a players regular seasons pitching stats by career.
         """
-        if self.pitcher:
+        if self.is_pitcher:
             pitching = pd.read_html(self.player_url, attrs={"id": "pitching_standard"})[
                 0
             ]
@@ -170,7 +182,7 @@ Player names are case-sensitive."""
         return batting
 
     def post_season_pitching(self, season=None):
-        if not self.pitcher:
+        if not self.is_pitcher:
             return None
         response = requests.get(self.player_url)
         soup = BeautifulSoup(response.text, features="lxml")
@@ -198,7 +210,7 @@ Player names are case-sensitive."""
         return pitching
 
     def career_totals_pitching(self, stat=None):
-        if self.pitcher:
+        if self.is_pitcher:
             reg = pd.read_html(self.player_url, attrs={"id": "pitching_standard"})[0]
             reg = reg[reg["Year"].str.contains("Yrs", na=False)]
             reg = reg.apply(pd.to_numeric, errors="ignore")

@@ -1,42 +1,48 @@
+import csv
 import os
 
-import enchant
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
 
-from sportrefpy.errors.not_found import PlayerNotFound
 from sportrefpy.nhl.league import NHL
+from sportrefpy.player.player import Player
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.player_dictionary import PlayerDictionary
 
 
-class NHLPlayer(NHL):
-    def __init__(self, player):
-        super().__init__()
-        player_dict = enchant.PyPWL(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nhl_players.txt"
-        )
-        first_letter = player.split()[-1][0].lower()
+class NHLPlayer(Player):
+    def __init__(self, name):
+        super().__init__(name)
+        if not self.is_valid_player:
+            PlayerDictionary.make_suggestion(NHL().player_dict, name)
+        self.full_name: str = name
+
+    @property
+    def identifying_letter(self):
+        return self.name.split()[-1][0].lower()
+
+    @property
+    def players(self):
         with open(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nhl_players.txt",
-            "r",
-        ) as player_dict:
-            if player in player_dict.read():
-                response = requests.get(self.url + f"/players/{first_letter}")
-                soup = BeautifulSoup(response.text, features="lxml")
-                for item in soup.find_all("p", attrs={"class": "nhl"}):
-                    if player in item.text.split(" (")[0]:
-                        self.player_url = self.url + item.find("a")["href"]
-                        self.full_name = player
-            else:
-                try:
-                    suggestion = player_dict.suggest(player)[0]
-                    message = f"""<{player}> not found.
-Is it possible you meant {suggestion}?
-Player names are case-sensitive."""
-                except:
-                    message = f"""<{player}> not found.
-Player names are case-sensitive."""
-                raise PlayerNotFound(message)
+            (os.path.dirname(os.path.dirname(__file__)) + "/assets/nhl_players.txt"),
+            newline="",
+        ) as players:
+            player_reader = csv.reader(players)
+            return [player[0] for player in player_reader]
+
+    @property
+    def player_url(self):
+        for item in self.soup.find_all("p", attrs={"class": "nhl"}):
+            if self.name in item.text.split(" (")[0]:
+                return f"{SportURLs.NHL.value}{item.find('a')['href']}"
+
+    @property
+    def response(self):
+        return requests.get(f"{SportURLs.NHL.value}/players/{self.identifying_letter}")
+
+    @property
+    def is_valid_player(self):
+        return self.name in self.players
 
     def regular_season_stats(self):
         """
