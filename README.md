@@ -57,11 +57,11 @@ Below are some examples for ways that you can use sportrefpy for each sport.
 ### Initialize a league, team, or player
 ```python
 from sportrefpy.nba.league import NBA
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 from sportrefpy.nba.player import NBAPlayer
 
 nba = NBA()
-sixers = NBAFranchise('PHI')
+sixers = NBATeam('PHI')
 the_answer = NBAPlayer('Allen Iverson')
 ```
 
@@ -91,7 +91,7 @@ beard.career_totals(stats=['PTS', 'G'])
 ```python
 from sportrefpy.nba.analysis import compare_players
 
-showtime = compare_players(["Shaquille O'Neal", "Kobe Bryant"], 
+showtime = compare_players(["Shaquille O'Neal", "Kobe Bryant"],
                             stats=['PTS', 'TRB'],
                             total='career')
 ```
@@ -109,9 +109,9 @@ compare_franchises(['NYK', 'BOS'])
 
 ### Get stats of players for a specific Franchise
 ```python
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
-bulls = NBAFranchise('CHI')
+bulls = NBATeam('CHI')
 
 # All players that have ever played for the team
 bulls.players_all_time_stats()
@@ -122,9 +122,9 @@ bulls.players_all_time_stats('Michael Jordan')
 
 ### Get stats of coaches for a specific Franchise
 ```python
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
-spurs = NBAFranchise('SAS')
+spurs = NBATeam('SAS')
 
 # All coaches that have ever coached the team
 spurs.coaches_all_time_data()
@@ -135,9 +135,9 @@ spurs.coaches_all_time_data('Gregg Popovich')
 
 ### Get roster for a given season
 ```python
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
-warriors = NBAFranchise('GSW')
+warriors = NBATeam('GSW')
 warriors.roster(2016)
 ```
 - use integer year that season ends in. This example returns the 2015-16 Golden State Warriors.
@@ -160,9 +160,9 @@ east = nba.conference_standings(conf='east')
 
 ### Get franchise season history
 ```python
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
-mavs = NBAFranchise('DAL')
+mavs = NBATeam('DAL')
 
 # Get all seasons
 mavs.season_history()
@@ -175,9 +175,9 @@ mavs.season_history(year='2010-11')
 
 ### Find which seasons a team won the NBA Finals
 ```python
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
-pistons = NHLFranchise('DET')
+pistons = NHLTeam('DET')
 seasons = pistons.season_history()
 seasons[seasons['Playoffs']  == 'Won Finals']]
 ```
@@ -187,7 +187,7 @@ seasons[seasons['Playoffs']  == 'Won Finals']]
 ### Initialize a league, team, or player
 ```python
 from sportrefpy.nhl.league import NHL
-from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nhl.team import NHLTeam
 from sportrefpy.nhl.player import NHLPlayer
 
 nhl = NHL()
@@ -214,9 +214,9 @@ compare_franchises(['TBL', 'DET'])
 
 ### Get roster for a given season
 ```python
-from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nhl.team import NHLTeam
 
-blues = NHLFranchise('STL')
+blues = NHLTeam('STL')
 blues.roster(2019)
 ```
 - use integer year that season ends in. This example returns the 2018-19 St. Louis Blues.
@@ -237,9 +237,9 @@ east = nhl.conference_standings(conf='east')
 
 ### Get franchise season history
 ```python
-from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nhl.team import NHLTeam
 
-flames = NHLFranchise('CGY')
+flames = NHLTeam('CGY')
 
 # Get all seasons
 flames.season_history()
@@ -252,9 +252,9 @@ flames.season_history(year='1988-89')
 
 ### Get Stanley Cup winning seasons
 ```python
-from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nhl.team import NHLTeam
 
-leafs = NHLFranchise('TOR')
+leafs = NHLTeam('TOR')
 seasons = leafs.season_history()
 seasons[seasons['Playoffs']  == 'Won Stanley Cup Final']]
 ```

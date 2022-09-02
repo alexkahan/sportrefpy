@@ -1,14 +1,14 @@
 import os
 
 from sportrefpy.nba.league import NBA
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
 
 def all_players():
     players = set()
     nba = NBA()
     for team in nba.teams.keys():
-        franchise = NBAFranchise(team)
+        franchise = NBATeam(team)
         players.update(franchise.players_all_time_stats().index)
     with open(
         os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nba_players.txt",

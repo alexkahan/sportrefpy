@@ -1,14 +1,14 @@
 import os
 
 from sportrefpy.nfl.league import NFL
-from sportrefpy.nfl.team import NFLFranchise
+from sportrefpy.nfl.team import NFLTeam
 
 
 def all_players():
     players = set()
     nfl = NFL()
     for team in nfl.teams.keys():
-        franchise = NFLFranchise(team)
+        franchise = NFLTeam(team)
         players.update(franchise.passer_all_time_stats().index)
         players.update(franchise.rusher_all_time_stats().index)
         players.update(franchise.receiving_all_time_stats().index)

@@ -1,18 +1,40 @@
-from sportrefpy.nhl.league import NHL
-import pandas as pd
 import numpy as np
+import pandas as pd
+
+from sportrefpy.nhl.league import NHL
+from sportrefpy.team.team import Team
 
 
-class NHLFranchise(NHL):
-    def __init__(self, franchise):
+class NHLTeam(Team):
+    def __init__(self, team):
         super().__init__()
-        self.franchise = franchise.upper()
-        self.abbreviation = self.teams[self.franchise]["abbrev"]
-        self.franchise_name = self.teams[self.franchise]["team_name"]
-        self.team_url = self.teams[franchise]["url"]
-        self.skaters_url = self.team_url.replace("history", "skaters")
-        self.goalies_url = self.team_url.replace("history", "goalies")
-        self.coaches_url = self.team_url.replace("history", "coaches")
+        nhl = NHL()
+        self._team = team.upper()
+        self._details = nhl.get_teams()[self._team]
+
+    @property
+    def abbreviation(self):
+        return self._details["abbrev"]
+
+    @property
+    def team(self):
+        return self._details["team_name"]
+
+    @property
+    def team_url(self):
+        return self._details["url"]
+
+    @property
+    def skaters_url(self):
+        return self.team_url.replace("history", "skaters")
+
+    @property
+    def goalies_url(self):
+        return self.team_url.replace("history", "goalies")
+
+    @property
+    def coaches_url(self):
+        return self.team_url.replace("history", "coaches")
 
     def skaters_all_time_stats(self, player=None):
         """

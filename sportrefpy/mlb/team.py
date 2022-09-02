@@ -1,19 +1,45 @@
-import pandas as pd
-from sportrefpy.mlb.league import MLB
 import numpy as np
+import pandas as pd
+
+from sportrefpy.mlb.league import MLB
+from sportrefpy.team.team import Team
+from sportrefpy.util.enums import SportURLs
 
 
-class MLBFranchise(MLB):
-    def __init__(self, franchise):
+class MLBTeam(Team):
+    def __init__(self, team):
         super().__init__()
-        self.franchise = franchise.upper()
-        self.abbreviation = franchise
-        self.franchise_name = self.teams[franchise]["team_name"]
-        self.team_url = self.teams[franchise]["url"]
-        self.batters_url = self.team_url + "bat.shtml"
-        self.pitchers_url = self.team_url + "pitch.shtml"
-        self.managers_url = self.team_url + "managers.shtml"
-        self.seasons_url = f"{self.url}/teams/{self.abbreviation}"
+        mlb = MLB()
+        self._team = team.upper()
+        self._details = mlb.get_teams()[self._team]
+
+    @property
+    def abbreviation(self):
+        return self._details["abbrev"]
+
+    @property
+    def team(self):
+        return self._details["team_name"]
+
+    @property
+    def team_url(self):
+        return self._details["url"]
+
+    @property
+    def batters_url(self):
+        return f"{self.team_url}bat.shtml"
+
+    @property
+    def pitchers_url(self):
+        return f"{self.team_url}pitch.shtml"
+
+    @property
+    def managers_url(self):
+        return f"{self.team_url}managers.shtml"
+
+    @property
+    def seasons_url(self):
+        return f"{SportURLs.MLB.value}/teams/{self.abbreviation}"
 
     def batters_all_time_stats(self, batter=None):
         """

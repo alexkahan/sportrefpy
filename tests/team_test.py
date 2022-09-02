@@ -1,22 +1,22 @@
 import pytest
 
-from sportrefpy.nba.team import NBAFranchise
-from sportrefpy.nba.analysis import compare_franchises as nba_compare_franchises
-from sportrefpy.nhl.team import NHLFranchise
-from sportrefpy.nfl.team import NFLFranchise
-from sportrefpy.mlb.team import MLBFranchise
 from sportrefpy.cfb.cfb import CFBSchool
-from sportrefpy.nhl.analysis import compare_franchises as nhl_compare_franchises
 from sportrefpy.mlb.analysis import compare_franchises as mlb_compare_franchises
+from sportrefpy.mlb.team import MLBTeam
+from sportrefpy.nba.analysis import compare_franchises as nba_compare_franchises
+from sportrefpy.nba.team import NBATeam
+from sportrefpy.nfl.team import NFLTeam
+from sportrefpy.nhl.analysis import compare_franchises as nhl_compare_franchises
+from sportrefpy.nhl.team import NHLTeam
 
 
 def test_NBA_franchise():
-    sixers = NBAFranchise("PhI")
+    sixers = NBATeam("PhI")
     assert sixers.franchise_name == "Philadelphia 76ers"
 
 
 def test_NBA_seasons():
-    celtics = NBAFranchise("boS")
+    celtics = NBATeam("boS")
     seasons = celtics.season_history()
     assert seasons.loc["2011-12", "DRtg"] == 98.2
 
@@ -30,29 +30,29 @@ def test_NBA_franchise_comparison():
 
 
 def test_NHL_franchise():
-    golden_knights = NHLFranchise("VEG")
+    golden_knights = NHLTeam("VEG")
     assert golden_knights.franchise_name == "Vegas Golden Knights"
 
 
 def test_NHL_seasons():
-    buffalo = NHLFranchise("BUF")
+    buffalo = NHLTeam("BUF")
     seasons = buffalo.season_history()
     assert seasons.loc["1999-00", "Finish"] == "3rd of 5"
 
 
 def test_NHL_roster():
-    flyers = NHLFranchise("PHI")
+    flyers = NHLTeam("PHI")
     assert "Scott Laughton" in flyers.roster(2022).index
 
 
 def test_NHL_goalies():
-    hurricanes = NHLFranchise("CAR")
+    hurricanes = NHLTeam("CAR")
     goalies = hurricanes.goalies_all_time_stats()
     assert goalies.loc["Cam Ward", "SV"] == 17261
 
 
 def test_NHL_skaters():
-    penguins = NHLFranchise("PIT")
+    penguins = NHLTeam("PIT")
     skaters = penguins.skaters_all_time_stats()
     assert skaters.loc["Mario Lemieux", "G"] == 690
 
@@ -66,47 +66,47 @@ def test_NHL_franchise_comparison():
 
 
 def test_NFL_franchise():
-    kc = NFLFranchise("kan")
+    kc = NFLTeam("kan")
     assert kc.franchise_name == "Kansas City Chiefs"
 
 
 def test_NFL_seasons():
-    eagles = NFLFranchise("PHI")
+    eagles = NFLTeam("PHI")
     seasons = eagles.season_history()
     assert seasons.loc[2017, "Playoffs"] == "Won SB"
 
 
 def test_NFL_coaching():
-    jets = NFLFranchise("nyj")
+    jets = NFLTeam("nyj")
     coaches = jets.coaches_all_time_data()
     assert "Rex Ryan" in coaches.index
 
 
 def test_MLB_franchise():
-    dodgers = MLBFranchise("LAD")
+    dodgers = MLBTeam("LAD")
     assert dodgers.franchise_name == "Los Angeles Dodgers"
 
 
 def test_MLB_seasons():
-    nyy = MLBFranchise("NYY")
+    nyy = MLBTeam("NYY")
     seasons = nyy.season_history()
     assert seasons.loc[1921, "Playoffs"] == "Lost WS (5-3)"
 
 
 def test_MLB_roster():
-    braves = MLBFranchise("ATL")
+    braves = MLBTeam("ATL")
     roster = braves.roster(1995)
     assert "Chipper Jones" in roster.index
 
 
 def test_MLB_batters():
-    dodgers = MLBFranchise("LAD")
+    dodgers = MLBTeam("LAD")
     batters = dodgers.batters_all_time_stats()
     assert batters.loc["Jackie Robinson", "G"] == 1382
 
 
 def test_MLB_pitchers():
-    pirates = MLBFranchise("PIT")
+    pirates = MLBTeam("PIT")
     pitchers = pirates.pitchers_all_time_stats()
     assert pitchers.loc["Jim Bunning", "L"] == 23
 

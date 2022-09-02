@@ -1,14 +1,14 @@
 import os
 
 from sportrefpy.nhl.league import NHL
-from sportrefpy.nhl.team import NHLFranchise
+from sportrefpy.nhl.team import NHLTeam
 
 
 def all_players():
     players = set()
     nhl = NHL()
     for team in nhl.teams.keys():
-        franchise = NHLFranchise(team)
+        franchise = NHLTeam(team)
         players.update(franchise.skaters_all_time_stats().index)
         players.update(franchise.goalies_all_time_stats().index)
     with open(

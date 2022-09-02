@@ -1,7 +1,7 @@
 import pandas as pd
 
 from sportrefpy.nba.player import NBAPlayer
-from sportrefpy.nba.team import NBAFranchise
+from sportrefpy.nba.team import NBATeam
 
 
 def compare_players(players, stats, total="career"):
@@ -69,7 +69,7 @@ def compare_players(players, stats, total="career"):
 
 
 def compare_franchises(teams):
-    teams = [NBAFranchise(team) for team in teams]
+    teams = [NBATeam(team) for team in teams]
     comparison = pd.concat(
         [team.season_history()[["W", "L"]].sum() for team in teams], axis=1
     )

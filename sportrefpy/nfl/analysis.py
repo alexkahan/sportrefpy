@@ -1,11 +1,12 @@
 import pandas as pd
 
+from sportrefpy.nfl.team import NFLTeam
+
 # from sportrefpy.nfl.player import NFLPlayer
-from sportrefpy.nfl.team import NFLFranchise
 
 
 def compare_franchises(teams):
-    teams = [NFLFranchise(team) for team in teams]
+    teams = [NFLTeam(team) for team in teams]
     comparison = pd.concat(
         [team.season_history()[["W", "L", "T"]].sum() for team in teams], axis=1
     )

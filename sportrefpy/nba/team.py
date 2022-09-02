@@ -1,20 +1,42 @@
 import pandas as pd
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 
 from sportrefpy.nba.league import NBA
+from sportrefpy.team.team import Team
+from sportrefpy.util.enums import SportURLs
 
 
-class NBAFranchise(NBA):
-    def __init__(self, franchise):
+class NBATeam(Team):
+    def __init__(self, team: str):
         super().__init__()
-        self.franchise = franchise.upper()
-        self.abbreviation = self.teams[self.franchise]["abbrev"]
-        self.franchise_name = self.teams[self.franchise]["team_name"]
-        self.team_url = self.teams[self.franchise]["url"]
-        self.players_url = self.team_url + "players.html"
-        self.coaches_url = self.team_url + "coaches.html"
-        self.seasons_url = f"{self.url}/teams/{self.abbreviation}"
+        nba = NBA()
+        self._team = team.upper()
+        self._details = nba.get_teams()[self._team]
+
+    @property
+    def abbreviation(self):
+        return self._details["abbrev"]
+
+    @property
+    def team(self):
+        return self._details["team_name"]
+
+    @property
+    def team_url(self):
+        return self._details["url"]
+
+    @property
+    def players_url(self):
+        return f"{self.team_url}players.html"
+
+    @property
+    def coaches_url(self):
+        return f"{self.team_url}coaches.html"
+
+    @property
+    def seasons_url(self):
+        return f"{SportURLs.NBA.value}/teams/{self.abbreviation}"
 
     def players_all_time_stats(self, player=None):
         """

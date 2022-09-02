@@ -1,19 +1,37 @@
 from xml.dom.pulldom import IGNORABLE_WHITESPACE
-import requests
-import pandas as pd
+
 import numpy as np
-from bs4 import BeautifulSoup, Comment
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from bs4 import Comment
 
 from sportrefpy.nfl.league import NFL
+from sportrefpy.team.team import Team
 
 
-class NFLFranchise(NFL):
-    def __init__(self, franchise):
+class NFLTeam(Team):
+    def __init__(self, team):
         super().__init__()
-        self.abbreviation = franchise.upper()
-        self.franchise_name = self.teams[franchise.lower()]["team_name"]
-        self.team_url = self.teams[franchise.lower()]["url"]
-        self.coaches_url = f"{self.team_url}coaches.htm"
+        nfl = NFL()
+        self._team = team.lower()
+        self._details = nfl.get_teams()[self._team]
+
+    @property
+    def abbreviation(self):
+        return self._details["abbrev"]
+
+    @property
+    def team(self):
+        return self._details["team_name"]
+
+    @property
+    def team_url(self):
+        return self._details["url"]
+
+    @property
+    def coaches_url(self):
+        return f"{self.team_url}coaches.htm"
 
     def passer_all_time_stats(self):
         """
