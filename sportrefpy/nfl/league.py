@@ -1,12 +1,11 @@
-import os
 from datetime import datetime
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from sportrefpy.nfl.team import NFLTeam
 from sportrefpy.sport.sport import Sport
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
@@ -26,6 +25,10 @@ class NFL(Sport):
             self.current_season_year = datetime.today().year
         else:
             self.current_season_year = datetime.today().year - 1
+
+    @staticmethod
+    def players():
+        return AllPlayers.nfl_players()
 
     def conference_standings(self, conf=None, season=None):
         """

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from sportrefpy.sport.sport import Sport
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
@@ -17,6 +18,9 @@ class CBB(Sport):
         self.soup = BeautifulSoup(self.response.text, features="lxml")
         self.soup_attrs = {"data-stat": "school_name"}
         self.teams = self.get_teams()
+
+    def players(self):
+        return AllPlayers.cbb_players()
 
     def get_teams(self):
         teams = dict()

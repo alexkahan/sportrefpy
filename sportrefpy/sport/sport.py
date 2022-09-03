@@ -18,8 +18,8 @@ class Sport(ABC):
     def player_dict(self):
         return PlayerDictionary.get_player_dictionary(self._name)
 
-    @property
-    def players(self):
+    @staticmethod
+    def players():
         raise NotImplementedError
 
     @staticmethod

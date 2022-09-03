@@ -2,96 +2,106 @@ import os
 
 import requests
 from bs4 import BeautifulSoup
+from bs4 import Tag
 
-from sportrefpy.cbb.cbb import CBB
-from sportrefpy.mlb.league import MLB
-from sportrefpy.mlb.team import MLBTeam
-from sportrefpy.nba.league import NBA
-from sportrefpy.nba.team import NBATeam
-from sportrefpy.nfl.league import NFL
-from sportrefpy.nfl.team import NFLTeam
-from sportrefpy.nhl.league import NHL
-from sportrefpy.nhl.team import NHLTeam
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class AllPlayers:
     @staticmethod
     def nhl_players():
         players = set()
-        nhl = NHL()
-        for team in nhl.teams.keys():
-            franchise = NHLTeam(team)
-            players.update(franchise.skaters_all_time_stats().index)
-            players.update(franchise.goalies_all_time_stats().index)
+        response = requests.get(f"{SportURLs.NHL.value}/players/")
+        soup = BeautifulSoup(response.text, features="lxml")
+        items = soup.find("ul", {"class": "page_index"})
+        letters = [
+            item.find("a") for item in items if item.find("a") and type(item) is Tag
+        ]
+        for letter in letters:
+            response = requests.get(f"{SportURLs.NHL.value}{letter.get('href')}")
+            soup = BeautifulSoup(response.text, features="lxml")
+            items = soup.find_all("p")
+            for item in items[2:]:
+                if "(" in item.text and ")" in item.text:
+                    try:
+                        players.add(Formatter.clean_player_name(item.text))
+                    except UnicodeEncodeError:
+                        continue
         return players
 
     @staticmethod
     def nfl_players():
         players = set()
-        nfl = NFL()
-        for team in nfl.teams.keys():
-            franchise = NFLTeam(team)
-            players.update(franchise.passer_all_time_stats().index)
-            players.update(franchise.rusher_all_time_stats().index)
-            players.update(franchise.receiving_all_time_stats().index)
-            players.update(franchise.returns_all_time_stats().index)
-            players.update(franchise.kicking_all_time_stats().index)
-            players.update(franchise.scoring_all_time_stats().index)
-            players.update(franchise.defense_all_time_stats().index)
-        with open(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nfl_players.txt",
-            "w",
-            encoding="ascii",
-        ) as file:
-            for player in players:
-                try:
-                    player = player.replace("*", "")
-                    file.write(f"{player}\n")
-                except UnicodeEncodeError:
-                    continue
+        response = requests.get(f"{SportURLs.NFL.value}/players/")
+        soup = BeautifulSoup(response.text, features="lxml")
+        items = soup.find_all("li")
+        letters = [
+            item.find("a") for item in items if item.find("a") and type(item) is Tag
+        ]
+        for letter in letters:
+            response = requests.get(f"{SportURLs.NFL.value}{letter}")
+            soup = BeautifulSoup(response.text, features="lxml")
+            items = soup.find_all("p")
+            for item in items:
+                if "(" in item.text and ")" in item.text:
+                    try:
+                        players.add(Formatter.clean_player_name(item.text))
+                    except UnicodeEncodeError:
+                        continue
+        return players
 
     @staticmethod
     def nba_players():
         players = set()
-        nba = NBA()
-        for team in nba.teams.keys():
-            franchise = NBATeam(team)
-            players.update(franchise.players_all_time_stats().index)
-        with open(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nba_players.txt",
-            "w",
-            encoding="ascii",
-        ) as file:
-            for player in players:
+        response = requests.get(f"{SportURLs.NBA.value}/players/")
+        soup = BeautifulSoup(response.text, features="lxml")
+        items = soup.find("ul", {"class": "page_index"}).find_all("li")
+        letters = [
+            item.find("a").get("href")
+            for item in items
+            if item.find("a") and type(item) is Tag
+        ]
+        letters = [letter for letter in letters if "/players/" in letter]
+        for letter in letters[:-1]:
+            response = requests.get(f"{SportURLs.NBA.value}{letter}")
+            soup = BeautifulSoup(response.text, features="lxml")
+            items = soup.find("tbody").find_all("tr")
+            for item in items:
+                # if "(" in item.text and ")" in item.text:
                 try:
-                    file.write(f"{player}\n")
+                    players.add(Formatter.clean_player_name(item.find("a").text))
                 except UnicodeEncodeError:
                     continue
+        return players
 
     @staticmethod
     def mlb_players():
         players = set()
-        mlb = MLB()
-        for team in mlb.teams.keys():
-            franchise = MLBTeam(team)
-            players.update(franchise.pitchers_all_time_stats().index)
-            players.update(franchise.batters_all_time_stats().index)
-        with open(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\mlb_players.txt",
-            "w",
-            encoding="ascii",
-        ) as file:
-            for player in players:
-                try:
-                    file.write(f"{player}\n")
-                except UnicodeEncodeError:
-                    continue
+        response = requests.get(f"{SportURLs.MLB.value}/players/")
+        soup = BeautifulSoup(response.text, features="lxml")
+        items = soup.find("ul", {"class": "page_index"}).find_all("li")
+        letters = [
+            item.find("a").get("href")
+            for item in items
+            if item.find("a") and type(item) is Tag
+        ]
+        for letter in letters:
+            response = requests.get(f"{SportURLs.MLB.value}{letter}")
+            soup = BeautifulSoup(response.text, features="lxml")
+            items = soup.find_all("p")
+            for item in items:
+                if "(" in item.text and ")" in item.text:
+                    try:
+                        players.add(Formatter.clean_player_name(item.text))
+                    except UnicodeEncodeError:
+                        continue
+        return players
 
     @staticmethod
     def cbb_players():
         players = set()
-        cbb = CBB()
-        response = requests.get(f"{cbb.url}/players/")
+        response = requests.get(f"{SportURLs.CBB.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find_all("li")
         letters = [
@@ -99,19 +109,14 @@ class AllPlayers:
             for item in items
             if "-index.html" in item.find("a")["href"]
         ]
-        with open(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\cbb_players.txt",
-            "a",
-            encoding="ascii",
-        ) as file:
-            for i in letters:
-                response = requests.get(f"https://www.sports-reference.com{i}")
-                soup = BeautifulSoup(response.text, features="lxml")
-                items = soup.find_all("p")
-                for item in items:
-                    if "(" in item.text and ")" in item.text:
-                        try:
-                            player = item.text.split("(")[0]
-                            file.write(f"{player}\n")
-                        except UnicodeEncodeError:
-                            continue
+        for letter in letters:
+            response = requests.get(f"https://www.sports-reference.com{letter}")
+            soup = BeautifulSoup(response.text, features="lxml")
+            items = soup.find_all("p")
+            for item in items:
+                if "(" in item.text and ")" in item.text:
+                    try:
+                        players.add(Formatter.clean_player_name(item.text))
+                    except UnicodeEncodeError:
+                        continue
+        return players

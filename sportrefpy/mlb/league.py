@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from bs4 import Comment
 
 from sportrefpy.sport.sport import Sport
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
@@ -26,6 +27,10 @@ class MLB(Sport):
             self.current_season_year = datetime.today().year
         else:
             self.current_season_year = datetime.today().year - 1
+
+    @staticmethod
+    def players():
+        return AllPlayers.mlb_players()
 
     def standings(self, season=None):
         """

@@ -11,3 +11,7 @@ class Formatter:
         if fmt == "json":
             return json.dumps(pd.transpose().to_dict())
         return pd.transpose().to_dict()
+
+    @staticmethod
+    def clean_player_name(player: str):
+        return player.split("(")[0].strip("+* ")

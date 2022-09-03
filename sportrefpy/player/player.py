@@ -32,7 +32,3 @@ class Player(ABC):
     @classmethod
     def compare(cls, players: List[str], **kwargs):
         raise NotImplementedError
-
-    @classmethod
-    def all_players(cls):
-        raise NotImplementedError

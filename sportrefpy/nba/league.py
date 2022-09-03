@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from sportrefpy.sport.sport import Sport
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
@@ -19,6 +20,10 @@ class NBA(Sport):
         self.soup = BeautifulSoup(self.response.text, features="lxml")
         self.soup_attrs = {"data-stat": "franch_name"}
         self.teams = self.get_teams()
+
+    @staticmethod
+    def players():
+        return AllPlayers.nba_players()
 
     def conference_standings(self, conf=None):
         east_conf = pd.read_html(self.standings_url)[-2]
