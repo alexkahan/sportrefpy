@@ -1,11 +1,13 @@
 from abc import ABC
+from typing import List
 
 from bs4 import BeautifulSoup
 
 
 class Player(ABC):
-    def __init__(self, name: str):
+    def __init__(self, name: str, fmt: str = "dict"):
         self.name = name
+        self.fmt = fmt
 
     @property
     def soup(self):
@@ -25,4 +27,12 @@ class Player(ABC):
 
     @property
     def is_valid_player(self):
+        raise NotImplementedError
+
+    @classmethod
+    def compare(cls, players: List[str], **kwargs):
+        raise NotImplementedError
+
+    @classmethod
+    def all_players(cls):
         raise NotImplementedError

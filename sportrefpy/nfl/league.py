@@ -1,9 +1,11 @@
+import os
 from datetime import datetime
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from sportrefpy.nfl.team import NFLTeam
 from sportrefpy.sport.sport import Sport
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum

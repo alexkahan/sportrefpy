@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -7,10 +9,17 @@ from requests import Response
 from sportrefpy.mlb.league import MLB
 from sportrefpy.player.player import Player
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 from sportrefpy.util.player_dictionary import PlayerDictionary
 
 
 class MLBPlayer(Player):
+    def __init__(self, name):
+        super().__init__(name)
+        if not self.is_valid_player:
+            PlayerDictionary.make_suggestion(MLB().player_dict, name)
+        self.full_name: str = name
+
     @property
     def identifying_letter(self):
         return self.name.split()[1][0].lower()
@@ -60,12 +69,6 @@ class MLBPlayer(Player):
     @property
     def is_valid_player(self):
         return self.name in self.players.text
-
-    def __init__(self, name):
-        super().__init__(name)
-        if not self.is_valid_player:
-            PlayerDictionary.make_suggestion(MLB().player_dict, name)
-        self.full_name: str = name
         # self.soup_attrs = {"id": "div_players_"}
 
     def regular_season_batting(self, season=None, stat=None):
@@ -99,10 +102,11 @@ class MLBPlayer(Player):
 
         if season:
             try:
-                return batting.loc[season]
+                batting = batting.loc[season]
             except KeyError:
                 return None
-        return batting
+
+        return Formatter.return_dict_or_json(batting, self.fmt)
 
     def regular_season_pitching(self, season=None):
         """
@@ -119,10 +123,10 @@ class MLBPlayer(Player):
             pitching.set_index("Year", inplace=True)
             if season:
                 try:
-                    return pitching.loc[season]
+                    pitching = pitching.loc[season]
                 except KeyError:
                     return None
-            return pitching
+            return Formatter.return_dict_or_json(pitching, self.fmt)
         else:
             return None
 
@@ -148,10 +152,10 @@ class MLBPlayer(Player):
         fielding.set_index("Year", inplace=True)
         if season:
             try:
-                return fielding.loc[season]
+                fielding = fielding.loc[season]
             except KeyError:
                 return None
-        return fielding
+        return Formatter.return_dict_or_json(fielding, self.fmt)
 
     def post_season_batting(self, season=None):
         if not self.playoffs:
@@ -176,10 +180,10 @@ class MLBPlayer(Player):
         batting.set_index("Year", inplace=True)
         if season:
             try:
-                return batting.loc[season]
+                batting = batting.loc[season]
             except KeyError:
                 return None
-        return batting
+        return Formatter.return_dict_or_json(batting, self.fmt)
 
     def post_season_pitching(self, season=None):
         if not self.is_pitcher:
@@ -204,10 +208,10 @@ class MLBPlayer(Player):
         pitching.set_index("Year", inplace=True)
         if season:
             try:
-                return pitching.loc[season]
+                pitching = pitching.loc[season]
             except KeyError:
                 return None
-        return pitching
+        return Formatter.return_dict_or_json(pitching, self.fmt)
 
     def career_totals_pitching(self, stat=None):
         if self.is_pitcher:
@@ -238,9 +242,9 @@ class MLBPlayer(Player):
 
             if stat:
                 try:
-                    return career.loc[stat]
+                    career = career.loc[stat]
                 except KeyError:
                     return None
-            return career
+            return Formatter.return_dict_or_json(career, self.fmt)
         else:
             return None

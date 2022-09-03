@@ -1,12 +1,11 @@
-import requests
 import os
 
-from bs4 import BeautifulSoup
-import pandas as pd
 import enchant
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 from sportrefpy.cbb.cbb import CBB
-from sportrefpy.errors.not_found import PlayerNotFound
 
 
 class CBBPlayer(CBB):
@@ -33,7 +32,7 @@ class CBBPlayer(CBB):
             else:
                 try:
                     suggestion = player_dict.suggest(player)[0]
-                    message = f"""<{player}> not found. 
+                    message = f"""<{player}> not found.
 Is it possible you meant {suggestion}?
 Player names are case-sensitive."""
                 except:

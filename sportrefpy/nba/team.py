@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -37,6 +39,18 @@ class NBATeam(Team):
     @property
     def seasons_url(self):
         return f"{SportURLs.NBA.value}/teams/{self.abbreviation}"
+
+    @classmethod
+    def compare(cls, franchises):
+        franchises = [cls(franchise) for franchise in franchises]
+        comparison = pd.concat(
+            [franchise.season_history()[["W", "L"]].sum() for franchise in franchises],
+            axis=1,
+        )
+        comparison.columns = [franchise.team for franchise in franchises]
+        comparison = comparison.transpose()
+        comparison["W%"] = comparison["W"] / (comparison["W"] + comparison["L"])
+        return comparison
 
     def players_all_time_stats(self, player=None):
         """

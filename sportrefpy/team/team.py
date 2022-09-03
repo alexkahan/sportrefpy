@@ -1,8 +1,5 @@
 from abc import ABC
-from abc import abstractmethod
-
-from sportrefpy.nba.league import NBA
-from sportrefpy.sport.sport import Sport
+from typing import List
 
 
 class Team(ABC):
@@ -16,4 +13,8 @@ class Team(ABC):
 
     @property
     def team_url(self):
+        raise NotImplementedError
+
+    @classmethod
+    def compare(cls, franchises: List[str]):
         raise NotImplementedError

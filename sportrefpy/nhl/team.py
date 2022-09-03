@@ -1,4 +1,5 @@
-import numpy as np
+from typing import List
+
 import pandas as pd
 
 from sportrefpy.nhl.league import NHL
@@ -11,6 +12,18 @@ class NHLTeam(Team):
         nhl = NHL()
         self._team = team.upper()
         self._details = nhl.get_teams()[self._team]
+
+    @classmethod
+    def compare(cls, franchises):
+        franchises = [cls(franchise) for franchise in franchises]
+        comparison = pd.concat(
+            [franchise.season_history()[["W", "L"]].sum() for franchise in franchises],
+            axis=1,
+        )
+        comparison.columns = [franchise.team for franchise in franchises]
+        comparison = comparison.transpose()
+        comparison["W%"] = comparison["W"] / (comparison["W"] + comparison["L"])
+        return comparison
 
     @property
     def abbreviation(self):

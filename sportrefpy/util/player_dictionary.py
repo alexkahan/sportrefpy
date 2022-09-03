@@ -5,7 +5,6 @@ import enchant
 from enchant import PyPWL
 
 from sportrefpy.errors.errors import PlayerNotFoundError
-from sportrefpy.errors.not_found import PlayerNotFound
 
 
 class PlayerDictionary:

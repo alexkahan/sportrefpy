@@ -1,6 +1,5 @@
-from xml.dom.pulldom import IGNORABLE_WHITESPACE
+from typing import List
 
-import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -32,6 +31,21 @@ class NFLTeam(Team):
     @property
     def coaches_url(self):
         return f"{self.team_url}coaches.htm"
+
+    @classmethod
+    def compare(cls, franchises):
+        franchises = [cls(franchise) for franchise in franchises]
+        comparison = pd.concat(
+            [
+                franchise.season_history()[["W", "L", "T"]].sum()
+                for franchise in franchises
+            ],
+            axis=1,
+        )
+        comparison.columns = [franchise.team for franchise in franchises]
+        comparison = comparison.transpose()
+        comparison["W%"] = comparison["W"] / (comparison["W"] + comparison["L"])
+        return comparison
 
     def passer_all_time_stats(self):
         """

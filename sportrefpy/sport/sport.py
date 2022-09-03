@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 from sportrefpy.util.player_dictionary import PlayerDictionary
 
@@ -19,6 +20,10 @@ class Sport(ABC):
 
     @property
     def players(self):
+        raise NotImplementedError
+
+    @staticmethod
+    def compare_franchises(franchises: List[str]):
         raise NotImplementedError
 
     def get_teams(self) -> dict:

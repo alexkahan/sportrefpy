@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
 
@@ -40,6 +42,21 @@ class MLBTeam(Team):
     @property
     def seasons_url(self):
         return f"{SportURLs.MLB.value}/teams/{self.abbreviation}"
+
+    @classmethod
+    def compare(cls, franchises):
+        franchises = [cls(franchise) for franchise in franchises]
+        comparison = pd.concat(
+            [
+                franchise.season_history()[["W", "L", "Ties"]].sum()
+                for franchise in franchises
+            ],
+            axis=1,
+        )
+        comparison.columns = [franchise.team for franchise in franchises]
+        comparison = comparison.transpose()
+        comparison["W%"] = comparison["W"] / (comparison["W"] + comparison["L"])
+        return comparison
 
     def batters_all_time_stats(self, batter=None):
         """

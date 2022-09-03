@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
 import requests
@@ -70,6 +72,110 @@ class NBAPlayer(Player):
     @property
     def is_valid_player(self) -> bool:
         return self.name in self.players
+
+    @classmethod
+    def compare(cls, players, stats=None, total="career"):
+        """
+        Compare regular season, post season, and career totals between two players.
+        """
+
+        players = [cls(player) for player in players]
+        if not stats:
+            if total == "career":
+                comparison = pd.concat(
+                    [player.career_totals() for player in players], axis=1
+                )
+                comparison.columns = [player.full_name for player in players]
+            elif total == "reg":
+                comparison = pd.concat(
+                    [player.regular_season_stats().sum() for player in players], axis=1
+                )
+                comparison.columns = [player.full_name for player in players]
+                comparison.drop(
+                    index={
+                        "Age",
+                        "Tm",
+                        "Lg",
+                        "Pos",
+                        "FG%",
+                        "3P%",
+                        "2P%",
+                        "eFG%",
+                        "FT%",
+                    },
+                    inplace=True,
+                )
+            elif total == "post":
+                comparison = pd.concat(
+                    [player.post_season_stats().sum() for player in players], axis=1
+                )
+                comparison.columns = [player.full_name for player in players]
+                comparison.drop(
+                    index={
+                        "Age",
+                        "Tm",
+                        "Lg",
+                        "Pos",
+                        "FG%",
+                        "3P%",
+                        "2P%",
+                        "eFG%",
+                        "FT%",
+                    },
+                    inplace=True,
+                )
+            return comparison
+        elif stats:
+            if total == "career":
+                comparison = pd.concat(
+                    [player.career_totals().loc[stats] for player in players], axis=1
+                )
+                comparison.columns = [player.full_name for player in players]
+            elif total == "reg":
+                comparison = pd.concat(
+                    [player.regular_season_stats().sum() for player in players], axis=1
+                )
+                comparison.columns = [player.full_name for player in players]
+                comparison.drop(
+                    index={
+                        "Age",
+                        "Tm",
+                        "Lg",
+                        "Pos",
+                        "FG%",
+                        "3P%",
+                        "2P%",
+                        "eFG%",
+                        "FT%",
+                    },
+                    inplace=True,
+                )
+                comparison = comparison.loc[stats]
+            elif total == "post":
+                comparison = pd.concat(
+                    [player.post_season_stats().sum() for player in players], axis=1
+                )
+                comparison.columns = [player.full_name for player in players]
+                comparison.drop(
+                    index={
+                        "Age",
+                        "Tm",
+                        "Lg",
+                        "Pos",
+                        "FG%",
+                        "3P%",
+                        "2P%",
+                        "eFG%",
+                        "FT%",
+                    },
+                    inplace=True,
+                )
+                comparison = comparison.loc[stats]
+            comparison = comparison.transpose()
+            comparison.columns = [stats]
+            return comparison
+        else:
+            raise Exception
 
     def regular_season_stats(self) -> pd.DataFrame:
         """
