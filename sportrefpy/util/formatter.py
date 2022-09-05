@@ -4,6 +4,7 @@ from abc import abstractmethod
 from typing import Dict
 from typing import Union
 
+import pandas as pd
 from pandas import DataFrame
 from pandas import Series
 
@@ -48,3 +49,5 @@ class PandasFormatter(Formatter):
     def output(data):
         if isinstance(data, (DataFrame, Series)):
             return data
+        if isinstance(data, dict):
+            return pd.DataFrame(data)

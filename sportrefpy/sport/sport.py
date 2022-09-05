@@ -16,16 +16,6 @@ class Sport(ABC):
         self.teams: Dict = {}
         self.fmt: str = fmt
 
-    @staticmethod
-    def players():
-        raise NotImplementedError
-
-    def compare_franchises(self, franchises: List[str]):
-        raise NotImplementedError
-
-    def compare_players(self, players: List[str], total="career"):
-        raise NotImplementedError
-
     def get_teams(self) -> dict:
         teams = dict()
         for item in self.soup.find_all(attrs=self.soup_attrs)[1 : self._num_teams + 1]:
@@ -36,3 +26,16 @@ class Sport(ABC):
             }
 
         return teams
+
+    @staticmethod
+    def players():
+        raise NotImplementedError
+
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
+
+    def compare_players(self, players: List[str], total="career"):
+        raise NotImplementedError
+
+    def box_score(self):
+        raise NotImplementedError
