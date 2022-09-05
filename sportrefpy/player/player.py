@@ -7,7 +7,7 @@ from bs4 import Tag
 from requests import Response
 
 from sportrefpy.errors.errors import PlayerNotFoundError
-from sportrefpy.util.player_checker import PlayerChecker
+from sportrefpy.player.util.player_checker import PlayerChecker
 
 
 class Player(ABC):

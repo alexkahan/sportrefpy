@@ -1,17 +1,17 @@
-from typing import List
+from typing import Dict
 
 import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from numpy.typing import DTypeLike
 from requests import Response
 
-from sportrefpy.nba.league import NBA
 from sportrefpy.player.player import Player
-from sportrefpy.util.all_players import AllPlayers
+from sportrefpy.player.util.all_players import AllPlayers
+from sportrefpy.player.util.career_totals import CareerTotals
+from sportrefpy.util.constants import NBA_CAREER_STATS
 from sportrefpy.util.enums import SportURLs
-from sportrefpy.util.player_checker import PlayerChecker
+from sportrefpy.util.formatter import Formatter
 
 
 class NBAPlayer(Player):
@@ -62,114 +62,6 @@ class NBAPlayer(Player):
             return self.game_log_url.replace("gamelog", "gamelog-playoffs")
         return None
 
-    @property
-    def is_valid_player(self) -> bool:
-        return self.name in self.players
-
-    @classmethod
-    def compare(cls, players, stats=None, total="career"):
-        """
-        Compare regular season, post season, and career totals between two players.
-        """
-
-        players = [cls(player) for player in players]
-        if not stats:
-            if total == "career":
-                comparison = pd.concat(
-                    [player.career_totals() for player in players], axis=1
-                )
-                comparison.columns = [player.full_name for player in players]
-            elif total == "reg":
-                comparison = pd.concat(
-                    [player.regular_season_stats().sum() for player in players], axis=1
-                )
-                comparison.columns = [player.full_name for player in players]
-                comparison.drop(
-                    index={
-                        "Age",
-                        "Tm",
-                        "Lg",
-                        "Pos",
-                        "FG%",
-                        "3P%",
-                        "2P%",
-                        "eFG%",
-                        "FT%",
-                    },
-                    inplace=True,
-                )
-            elif total == "post":
-                comparison = pd.concat(
-                    [player.post_season_stats().sum() for player in players], axis=1
-                )
-                comparison.columns = [player.full_name for player in players]
-                comparison.drop(
-                    index={
-                        "Age",
-                        "Tm",
-                        "Lg",
-                        "Pos",
-                        "FG%",
-                        "3P%",
-                        "2P%",
-                        "eFG%",
-                        "FT%",
-                    },
-                    inplace=True,
-                )
-            return comparison
-        elif stats:
-            if total == "career":
-                comparison = pd.concat(
-                    [player.career_totals().loc[stats] for player in players], axis=1
-                )
-                comparison.columns = [player.full_name for player in players]
-            elif total == "reg":
-                comparison = pd.concat(
-                    [player.regular_season_stats().sum() for player in players], axis=1
-                )
-                comparison.columns = [player.full_name for player in players]
-                comparison.drop(
-                    index={
-                        "Age",
-                        "Tm",
-                        "Lg",
-                        "Pos",
-                        "FG%",
-                        "3P%",
-                        "2P%",
-                        "eFG%",
-                        "FT%",
-                    },
-                    inplace=True,
-                )
-                comparison = comparison.loc[stats]
-            elif total == "post":
-                comparison = pd.concat(
-                    [player.post_season_stats().sum() for player in players], axis=1
-                )
-                comparison.columns = [player.full_name for player in players]
-                comparison.drop(
-                    index={
-                        "Age",
-                        "Tm",
-                        "Lg",
-                        "Pos",
-                        "FG%",
-                        "3P%",
-                        "2P%",
-                        "eFG%",
-                        "FT%",
-                    },
-                    inplace=True,
-                )
-                comparison = comparison.loc[stats]
-            comparison = comparison.transpose()
-            comparison.columns = [stats]
-            return comparison
-        else:
-            raise Exception
-
     def regular_season_stats(self) -> pd.DataFrame:
         """
         Returns a players regular seasons stats by season or by career.
@@ -187,7 +79,7 @@ class NBAPlayer(Player):
         stats = stats[~stats["Season"].str.contains("season|Career")]
         stats.set_index("Season", inplace=True)
 
-        return stats
+        return Formatter.convert(stats, self.fmt)
 
     def post_season_stats(self) -> pd.DataFrame:
         """
@@ -208,7 +100,7 @@ class NBAPlayer(Player):
             stats = stats[~stats["Season"].str.contains("season|Career")]
             stats.set_index("Season", inplace=True)
 
-            return stats
+            return Formatter.convert(stats, self.fmt)
 
     def reg_season_game_log(self, season) -> pd.Series:
         year = str(1 + int(season.split("-")[0]))
@@ -226,7 +118,7 @@ class NBAPlayer(Player):
                 continue
         games.set_index("G", inplace=True)
 
-        return games
+        return Formatter.convert(games, self.fmt)
 
     def post_season_game_log(self) -> pd.Series:
         if self.playoffs:
@@ -247,50 +139,23 @@ class NBAPlayer(Player):
                     continue
             playoffs.set_index("G", inplace=True)
 
-            return playoffs
+            return Formatter.convert(playoffs, self.fmt)
         else:
             return None
 
-    def career_totals(self, stat=None) -> pd.Series:
+    # TODO: fix this to work with Formatter.output()
+    def career_totals(self) -> Dict:
         """
         Find player totals (includes regular and post season)
         """
-
+        career_totals: Dict[str, Dict] = {}
         reg = self.regular_season_stats()
-        reg.reset_index(inplace=True)
         post = self.post_season_stats()
-        post.reset_index(inplace=True)
-        career = reg.merge(post, how="outer")
-        career = career[
-            [
-                "G",
-                "GS",
-                "MP",
-                "FG",
-                "FGA",
-                "3P",
-                "3PA",
-                "2P",
-                "2PA",
-                "FT",
-                "FTA",
-                "ORB",
-                "DRB",
-                "TRB",
-                "AST",
-                "STL",
-                "BLK",
-                "TOV",
-                "PF",
-                "PTS",
-                "Trp Dbl",
-            ]
-        ]
-        career = pd.DataFrame(career.sum())
-        career.rename(columns={0: self.full_name}, inplace=True)
-        if stat:
-            career = career.loc[stat]
-        return career
+        career_totals = CareerTotals.unpack_career_stats(
+            reg, post, NBA_CAREER_STATS, career_totals
+        )
+
+        return career_totals
 
     def __repr__(self):
         return f"<{self.full_name}>"

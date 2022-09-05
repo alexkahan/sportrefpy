@@ -1,12 +1,9 @@
-import requests
 from bs4 import BeautifulSoup
 from requests import Response
 
-from sportrefpy.nfl.league import NFL
 from sportrefpy.player.player import Player
-from sportrefpy.util.all_players import AllPlayers
+from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.util.enums import SportURLs
-from sportrefpy.util.player_checker import PlayerChecker
 
 
 class NFLPlayer(Player):
@@ -37,7 +34,3 @@ class NFLPlayer(Player):
     @property
     def player_soup(self) -> BeautifulSoup:
         raise NotImplementedError
-
-    @property
-    def is_valid_player(self):
-        return self.name in self.players.text

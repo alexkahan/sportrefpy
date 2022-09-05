@@ -1,25 +1,29 @@
 from abc import ABC
+from typing import Dict
 from typing import List
 
-from sportrefpy.util.player_checker import PlayerChecker
+from bs4 import BeautifulSoup
+from requests import Response
 
 
 class Sport(ABC):
-    def __init__(self):
-        self._name = None
-        self._num_teams = None
-        self.url = None
-        self.response = None
-        self.soup = None
-        self.soup_attrs = None
-        self.teams = None
+    def __init__(self, fmt: str = "dict"):
+        self._num_teams: int = 0
+        self.url: str = ""
+        self.response: Response = Response()
+        self.soup: BeautifulSoup = BeautifulSoup()
+        self.soup_attrs: Dict = {}
+        self.teams: Dict = {}
+        self.fmt: str = fmt
 
     @staticmethod
     def players():
         raise NotImplementedError
 
-    @staticmethod
-    def compare_franchises(franchises: List[str]):
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
+
+    def compare_players(self, players: List[str], total="career"):
         raise NotImplementedError
 
     def get_teams(self) -> dict:
@@ -32,7 +36,3 @@ class Sport(ABC):
             }
 
         return teams
-
-    def franchise_codes(self) -> None:
-        for abbrev, team_name in self.teams.items():
-            print(f"{abbrev} ({team_name['team_name']})")

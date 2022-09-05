@@ -1,12 +1,16 @@
+from typing import List
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from sportrefpy.nba.player import NBAPlayer
+from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.sport.sport import Sport
-from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class NBA(Sport):
@@ -42,3 +46,21 @@ class NBA(Sport):
             return west_conf
 
         return east_conf, west_conf
+
+    # TODO: fix this to work with Formatter.output()
+    def compare_players(self, players: List[str], total="career"):
+        players_to_compare = [NBAPlayer(player) for player in players]
+        if total == "career":
+            comparison = {
+                player.name: player.career_totals() for player in players_to_compare
+            }
+        elif total == "reg":
+            comparison = {
+                player.name: player.regular_season_stats()
+                for player in players_to_compare
+            }
+        elif total == "post":
+            comparison = {
+                player.name: player.post_season_stats() for player in players_to_compare
+            }
+        return Formatter.convert(comparison, self.fmt)

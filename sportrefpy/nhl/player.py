@@ -1,8 +1,9 @@
 import pandas as pd
 
 from sportrefpy.player.player import Player
-from sportrefpy.util.all_players import AllPlayers
+from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class NHLPlayer(Player):
@@ -25,10 +26,6 @@ class NHLPlayer(Player):
         for item in self.soup.find_all("p", attrs={"class": "nhl"}):
             if self.name in item.text.split(" (")[0]:
                 return f"{SportURLs.NHL.value}{item.find('a')['href']}"
-
-    @property
-    def is_valid_player(self):
-        return self.name in self.players
 
     def regular_season_stats(self):
         """
@@ -68,4 +65,4 @@ class NHLPlayer(Player):
         stats = stats[stats["Lg"] == "NHL"]
         stats.drop(columns={"Lg", "TOI", "ATOI"}, inplace=True)
 
-        return stats
+        return Formatter.convert(stats, self.fmt)

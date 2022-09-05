@@ -3,6 +3,9 @@ from typing import List
 
 
 class Team(ABC):
+    def __init__(self, fmt: str = "dict"):
+        self.fmt = fmt
+
     @property
     def abbreviation(self):
         raise NotImplementedError

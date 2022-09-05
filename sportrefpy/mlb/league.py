@@ -1,13 +1,12 @@
 from datetime import datetime
-from typing import List
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from bs4 import Comment
 
+from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.sport.sport import Sport
-from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
