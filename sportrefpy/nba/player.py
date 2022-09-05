@@ -9,28 +9,25 @@ from requests import Response
 
 from sportrefpy.nba.league import NBA
 from sportrefpy.player.player import Player
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import SportURLs
-from sportrefpy.util.player_dictionary import PlayerDictionary
+from sportrefpy.util.player_checker import PlayerChecker
 
 
 class NBAPlayer(Player):
     def __init__(self, name):
         super().__init__(name)
-        if not self.is_valid_player:
-            PlayerDictionary.make_suggestion(NBA().player_dict, name)
+        self.name = name
         self.full_name: str = name
+        self.sport_url = SportURLs.NBA.value
 
     @property
     def identifying_letter(self) -> str:
         return self.name.split()[-1][0].lower()
 
     @property
-    def players(self) -> DTypeLike:
-        players = pd.read_html(
-            SportURLs.NBA.value + f"/players/{self.identifying_letter}"
-        )[0]
-        players["Player"] = players["Player"].apply(lambda x: x.split("*")[0])
-        return players["Player"].values
+    def players(self) -> set:
+        return AllPlayers.nba_players()
 
     @property
     def player_url(self):
@@ -38,10 +35,6 @@ class NBAPlayer(Player):
             if self.name in item.text:
                 return f"{SportURLs.NBA.value}{item.find('a')['href']}"
         return None
-
-    @property
-    def response(self) -> Response:
-        return requests.get(f"{SportURLs.NBA.value}/players/{self.identifying_letter}")
 
     @property
     def player_response(self) -> Response:

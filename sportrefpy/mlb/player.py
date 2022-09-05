@@ -6,37 +6,35 @@ from bs4 import BeautifulSoup
 from bs4 import Comment
 from requests import Response
 
+from sportrefpy.errors.errors import PlayerNotFoundError
 from sportrefpy.mlb.league import MLB
 from sportrefpy.player.player import Player
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import SportURLs
 from sportrefpy.util.formatter import Formatter
-from sportrefpy.util.player_dictionary import PlayerDictionary
+from sportrefpy.util.player_checker import PlayerChecker
 
 
 class MLBPlayer(Player):
     def __init__(self, name):
         super().__init__(name)
-        if not self.is_valid_player:
-            PlayerDictionary.make_suggestion(MLB().player_dict, name)
+        self.name = name
         self.full_name: str = name
+        self.sport_url = SportURLs.MLB.value
 
     @property
     def identifying_letter(self):
         return self.name.split()[1][0].lower()
 
     @property
-    def players(self):
-        return self.soup.find("div", attrs={"id": "div_players_"})
+    def players(self) -> set:
+        return AllPlayers.mlb_players()
 
     @property
     def player_url(self):
         for choice in self.players:
             if self.name in choice.text:
                 return f"{SportURLs.MLB.value}{choice.find('a')['href']}"
-
-    @property
-    def response(self):
-        return requests.get(f"{SportURLs.MLB.value}/players/{self.identifying_letter}")
 
     @property
     def player_response(self) -> Response:

@@ -1,44 +1,30 @@
-import csv
-import os
-
 import pandas as pd
-import requests
 
-from sportrefpy.nhl.league import NHL
 from sportrefpy.player.player import Player
+from sportrefpy.util.all_players import AllPlayers
 from sportrefpy.util.enums import SportURLs
-from sportrefpy.util.player_dictionary import PlayerDictionary
 
 
 class NHLPlayer(Player):
     def __init__(self, name):
         super().__init__(name)
-        if not self.is_valid_player:
-            PlayerDictionary.make_suggestion(NHL().player_dict, name)
+        self.name = name
         self.full_name: str = name
+        self.sport_url = SportURLs.NHL.value
 
     @property
     def identifying_letter(self):
         return self.name.split()[-1][0].lower()
 
     @property
-    def players(self):
-        with open(
-            (os.path.dirname(os.path.dirname(__file__)) + "/assets/nhl_players.txt"),
-            newline="",
-        ) as players:
-            player_reader = csv.reader(players)
-            return [player[0] for player in player_reader]
+    def players(self) -> set:
+        return AllPlayers.nhl_players()
 
     @property
     def player_url(self):
         for item in self.soup.find_all("p", attrs={"class": "nhl"}):
             if self.name in item.text.split(" (")[0]:
                 return f"{SportURLs.NHL.value}{item.find('a')['href']}"
-
-    @property
-    def response(self):
-        return requests.get(f"{SportURLs.NHL.value}/players/{self.identifying_letter}")
 
     @property
     def is_valid_player(self):

@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import List
 
-from sportrefpy.util.player_dictionary import PlayerDictionary
+from sportrefpy.util.player_checker import PlayerChecker
 
 
 class Sport(ABC):
@@ -13,10 +13,6 @@ class Sport(ABC):
         self.soup = None
         self.soup_attrs = None
         self.teams = None
-
-    @property
-    def player_dict(self):
-        return PlayerDictionary.get_player_dictionary(self._name)
 
     @staticmethod
     def players():

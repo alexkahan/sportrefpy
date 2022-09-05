@@ -10,7 +10,7 @@ from sportrefpy.util.formatter import Formatter
 
 class AllPlayers:
     @staticmethod
-    def nhl_players():
+    def nhl_players() -> set:
         players = set()
         response = requests.get(f"{SportURLs.NHL.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
@@ -31,28 +31,31 @@ class AllPlayers:
         return players
 
     @staticmethod
-    def nfl_players():
+    def nfl_players() -> set:
         players = set()
         response = requests.get(f"{SportURLs.NFL.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find_all("li")
         letters = [
-            item.find("a") for item in items if item.find("a") and type(item) is Tag
+            item.find("a")["href"]
+            for item in items
+            if item.find("a") and type(item) is Tag
         ]
         for letter in letters:
-            response = requests.get(f"{SportURLs.NFL.value}{letter}")
-            soup = BeautifulSoup(response.text, features="lxml")
-            items = soup.find_all("p")
-            for item in items:
-                if "(" in item.text and ")" in item.text:
-                    try:
-                        players.add(Formatter.clean_player_name(item.text))
-                    except UnicodeEncodeError:
-                        continue
+            if "/players/" in letter:
+                response = requests.get(f"{SportURLs.NFL.value}{letter}")
+                soup = BeautifulSoup(response.text, features="lxml")
+                items = soup.find_all("p")
+                for item in items:
+                    if "(" in item.text and ")" in item.text:
+                        try:
+                            players.add(Formatter.clean_player_name(item.text))
+                        except UnicodeEncodeError:
+                            continue
         return players
 
     @staticmethod
-    def nba_players():
+    def nba_players() -> set:
         players = set()
         response = requests.get(f"{SportURLs.NBA.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
@@ -76,7 +79,7 @@ class AllPlayers:
         return players
 
     @staticmethod
-    def mlb_players():
+    def mlb_players() -> set:
         players = set()
         response = requests.get(f"{SportURLs.MLB.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
