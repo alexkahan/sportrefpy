@@ -1,3 +1,4 @@
+import requests
 from bs4 import BeautifulSoup
 from requests import Response
 
@@ -18,19 +19,13 @@ class NFLPlayer(Player):
         return self.name.split()[1][0].upper()
 
     @property
-    def players(self) -> set:
+    def players(self) -> dict:
         return AllPlayers.nfl_players()
 
     @property
-    def player_url(self):
-        for player in self.players:
-            if self.name in player.text:
-                return f"{SportURLs.NFL.value}{player.find('a')['href']}"
-
-    @property
     def player_response(self) -> Response:
-        raise NotImplementedError
+        return requests.get(self.player_url)
 
     @property
     def player_soup(self) -> BeautifulSoup:
-        raise NotImplementedError
+        return BeautifulSoup(self.player_response.text, features="lxml")

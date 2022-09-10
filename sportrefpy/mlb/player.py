@@ -22,14 +22,8 @@ class MLBPlayer(Player):
         return self.name.split()[1][0].lower()
 
     @property
-    def players(self) -> set:
+    def players(self) -> dict:
         return AllPlayers.mlb_players()
-
-    @property
-    def player_url(self):
-        for choice in self.players:
-            if self.name in choice.text:
-                return f"{SportURLs.MLB.value}{choice.find('a')['href']}"
 
     @property
     def player_response(self) -> Response:

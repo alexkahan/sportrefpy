@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 from typing import List
 
 import requests
@@ -26,6 +27,14 @@ class Player(ABC):
     def soup(self) -> Tag:
         return BeautifulSoup(self.response.text, features="lxml")
 
+    def accolades(self):
+        accolades = self.player_soup.find("ul", {"id": "bling"})
+        if accolades:
+            return {
+                accolade.text.strip() for accolade in accolades if accolade.text.strip()
+            }
+        return None
+
     @property
     def identifying_letter(self):
         raise NotImplementedError
@@ -36,7 +45,7 @@ class Player(ABC):
 
     @property
     def player_url(self):
-        raise NotImplementedError
+        return self.players[self.name]
 
     @property
     def is_valid_player(self):

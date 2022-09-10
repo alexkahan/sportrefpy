@@ -64,3 +64,7 @@ class NBA(Sport):
                 player.name: player.post_season_stats() for player in players_to_compare
             }
         return Formatter.convert(comparison, self.fmt)
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        return NBABoxScore.exact_game(day, month, year, home_team)

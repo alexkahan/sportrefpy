@@ -1,67 +1,92 @@
 from abc import ABC
 from abc import abstractmethod
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
 from sportrefpy.util.enums import BoxScoreURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class BoxScore(ABC):
     @staticmethod
     @abstractmethod
-    def find_games_by_day(day, month, year):
+    def all_games(day, month, year):
         raise NotImplementedError
 
+    @staticmethod
     @abstractmethod
-    def find_exact_game(self, day, month, year):
+    def exact_game(day, month, year, home_team):
         raise NotImplementedError
 
 
 class NBABoxScore(BoxScore):
     @staticmethod
-    def find_games_by_day(day, month, year):
+    def all_games(day, month, year):
         raise NotImplementedError
 
-    def find_exact_game(self, day, month, year):
-        raise NotImplementedError
+    @staticmethod
+    def exact_game(day, month, year, home_team):
+        game_url = f"{BoxScoreURLs.NBA.value}{year}{Formatter.date(month)}{Formatter.date(day)}0{home_team.upper()}.html"
+        response = requests.get(game_url)
+        soup = BeautifulSoup(response.text, features="lxml")
+        line_score = soup.find_all("table")
+        away_tables = pd.read_html(game_url)[:2]
+        home_tables = pd.read_html(game_url)[2:]
+        return
 
 
 class NHLBoxScore(BoxScore):
-    def find_games_by_day(self, day, month, year):
-        pass
-
-    def find_exact_game(self, day, month, year):
+    @staticmethod
+    def all_games(day, month, year):
         raise NotImplementedError
+
+    @staticmethod
+    def exact_game(day, month, year, home_team):
+        response = requests.get(
+            f"{BoxScoreURLs.NHL.value}{year}{month}{day}0{home_team}"
+        )
+        soup = BeautifulSoup(response.text, features="lxml")
+        final_score = soup.find_all("div", {"class": "score"})
+        return
 
 
 class NFLBoxScore(BoxScore):
-    def find_games_by_day(self, day, month, year):
-        pass
+    @staticmethod
+    def all_games(day, month, year):
+        raise NotImplementedError
 
-    def find_exact_game(self, day, month, year):
+    @staticmethod
+    def exact_game(day, month, year, home_team):
         raise NotImplementedError
 
 
 class MLBBoxScore(BoxScore):
-    def find_games_by_day(self, day, month, year):
-        pass
+    @staticmethod
+    def all_games(day, month, year):
+        raise NotImplementedError
 
-    def find_exact_game(self, day, month, year):
+    @staticmethod
+    def exact_game(day, month, year, home_team):
         raise NotImplementedError
 
 
 class CBBBoxScore(BoxScore):
-    def find_games_by_day(self, day, month, year):
-        pass
+    @staticmethod
+    def find_games_by_day(day, month, year):
+        raise NotImplementedError
 
-    def find_exact_game(self, day, month, year):
+    @staticmethod
+    def find_exact_game(day, month, year):
         raise NotImplementedError
 
 
 class CFBBoxScore(BoxScore):
-    def find_games_by_day(self, day, month, year):
-        pass
+    @staticmethod
+    def all_games(day, month, year):
+        raise NotImplementedError
 
-    def find_exact_game(self, day, month, year):
+    @staticmethod
+    def exact_game(day, month, year, home_team):
         raise NotImplementedError

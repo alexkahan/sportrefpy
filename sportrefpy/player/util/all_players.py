@@ -10,8 +10,8 @@ from sportrefpy.util.formatter import Formatter
 
 class AllPlayers:
     @staticmethod
-    def nhl_players() -> set:
-        players = set()
+    def nhl_players() -> dict:
+        players = dict()
         response = requests.get(f"{SportURLs.NHL.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find("ul", {"class": "page_index"})
@@ -25,14 +25,15 @@ class AllPlayers:
             for item in items[2:]:
                 if "(" in item.text and ")" in item.text:
                     try:
-                        players.add(Formatter.clean_player_name(item.text))
+                        player = Formatter.clean_player_name(item.text)
+                        players[player] = f"{SportURLs.NHL.value}{item.a['href']}"
                     except UnicodeEncodeError:
                         continue
         return players
 
     @staticmethod
-    def nfl_players() -> set:
-        players = set()
+    def nfl_players() -> dict:
+        players = dict()
         response = requests.get(f"{SportURLs.NFL.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find_all("li")
@@ -49,19 +50,20 @@ class AllPlayers:
                 for item in items:
                     if "(" in item.text and ")" in item.text:
                         try:
-                            players.add(Formatter.clean_player_name(item.text))
+                            player = Formatter.clean_player_name(item.text)
+                            players[player] = f"{SportURLs.NFL.value}{item.a['href']}"
                         except UnicodeEncodeError:
                             continue
         return players
 
     @staticmethod
-    def nba_players() -> set:
-        players = set()
+    def nba_players() -> dict:
+        players = dict()
         response = requests.get(f"{SportURLs.NBA.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find("ul", {"class": "page_index"}).find_all("li")
         letters = [
-            item.find("a").get("href")
+            item.find("a")["href"]
             for item in items
             if item.find("a") and type(item) is Tag
         ]
@@ -71,16 +73,16 @@ class AllPlayers:
             soup = BeautifulSoup(response.text, features="lxml")
             items = soup.find("tbody").find_all("tr")
             for item in items:
-                # if "(" in item.text and ")" in item.text:
                 try:
-                    players.add(Formatter.clean_player_name(item.find("a").text))
+                    player = Formatter.clean_player_name(item.a.text)
+                    players[player] = f"{SportURLs.NBA.value}{item.a['href']}"
                 except UnicodeEncodeError:
                     continue
         return players
 
     @staticmethod
-    def mlb_players() -> set:
-        players = set()
+    def mlb_players() -> dict:
+        players = dict()
         response = requests.get(f"{SportURLs.MLB.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find("ul", {"class": "page_index"}).find_all("li")
@@ -96,14 +98,15 @@ class AllPlayers:
             for item in items:
                 if "(" in item.text and ")" in item.text:
                     try:
-                        players.add(Formatter.clean_player_name(item.text))
+                        player = Formatter.clean_player_name(item.text)
+                        players[player] = f"{SportURLs.MLB.value}{item.a['href']}"
                     except UnicodeEncodeError:
                         continue
         return players
 
     @staticmethod
-    def cbb_players():
-        players = set()
+    def cbb_players() -> dict:
+        players = dict()
         response = requests.get(f"{SportURLs.CBB.value}/players/")
         soup = BeautifulSoup(response.text, features="lxml")
         items = soup.find_all("li")
@@ -119,7 +122,10 @@ class AllPlayers:
             for item in items:
                 if "(" in item.text and ")" in item.text:
                     try:
-                        players.add(Formatter.clean_player_name(item.text))
+                        player = Formatter.clean_player_name(item.text)
+                        players[
+                            player
+                        ] = f"{SportURLs.SPORTS_REFERENCE.value}{item.a['href']}"
                     except UnicodeEncodeError:
                         continue
         return players

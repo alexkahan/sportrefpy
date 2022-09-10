@@ -1,4 +1,7 @@
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from requests import Response
 
 from sportrefpy.player.player import Player
 from sportrefpy.player.util.all_players import AllPlayers
@@ -18,14 +21,16 @@ class NHLPlayer(Player):
         return self.name.split()[-1][0].lower()
 
     @property
-    def players(self) -> set:
+    def players(self) -> dict:
         return AllPlayers.nhl_players()
 
     @property
-    def player_url(self):
-        for item in self.soup.find_all("p", attrs={"class": "nhl"}):
-            if self.name in item.text.split(" (")[0]:
-                return f"{SportURLs.NHL.value}{item.find('a')['href']}"
+    def player_response(self) -> Response:
+        return requests.get(self.player_url)
+
+    @property
+    def player_soup(self) -> BeautifulSoup:
+        return BeautifulSoup(self.player_response.text, features="lxml")
 
     def regular_season_stats(self):
         """

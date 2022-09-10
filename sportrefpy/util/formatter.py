@@ -24,6 +24,10 @@ class Formatter(ABC):
         return player.split("(")[0].strip("+* ")
 
     @staticmethod
+    def date(number: int):
+        return "{:02d}".format(number)
+
+    @staticmethod
     @abstractmethod
     def output(data):
         raise NotImplementedError

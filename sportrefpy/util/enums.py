@@ -26,6 +26,7 @@ class SportURLs(enum.Enum):
     MLB = "https://www.baseball-reference.com"
     CBB = "https://www.sports-reference.com/cbb"
     CFB = "https://www.sports-reference.com/cfb"
+    SPORTS_REFERENCE = "https://www.sports-reference.com"
 
 
 class BoxScoreURLs(enum.Enum):
@@ -35,3 +36,7 @@ class BoxScoreURLs(enum.Enum):
     MLB = f"{SportURLs.MLB.value}/boxes/"
     CBB = f"{SportURLs.CBB.value}/boxscores/"
     CFB = f"{SportURLs.CFB.value}/boxscores/"
+
+
+class NBATeams(enum.Enum):
+    pass

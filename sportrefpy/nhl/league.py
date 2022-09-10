@@ -49,3 +49,7 @@ class NHL(Sport):
         elif conf == "west":
             return west_conf
         return east_conf, west_conf
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        raise NotImplementedError

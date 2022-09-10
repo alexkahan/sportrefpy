@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 from typing import Dict
 from typing import List
 
@@ -37,5 +38,7 @@ class Sport(ABC):
     def compare_players(self, players: List[str], total="career"):
         raise NotImplementedError
 
-    def box_score(self):
+    @staticmethod
+    @abstractmethod
+    def box_score(day, month, year, home_team):
         raise NotImplementedError

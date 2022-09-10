@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.sport.sport import Sport
+from sportrefpy.util.enums import BoxScoreURLs
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
@@ -93,3 +94,11 @@ class NFL(Sport):
         season_leaders.set_index("Year", inplace=True)
 
         return season_leaders
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        page = requests.get(
+            f"{BoxScoreURLs.NFL.value}{year}{month}{day}0{home_team}.htm"
+        ).text
+        soup = BeautifulSoup(page, "lxml")
+        print("hi")

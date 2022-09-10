@@ -26,15 +26,8 @@ class NBAPlayer(Player):
         return self.name.split()[-1][0].lower()
 
     @property
-    def players(self) -> set:
+    def players(self) -> dict:
         return AllPlayers.nba_players()
-
-    @property
-    def player_url(self):
-        for item in self.soup.find_all("th", attrs={"class": "left"}):
-            if self.name in item.text:
-                return f"{SportURLs.NBA.value}{item.find('a')['href']}"
-        return None
 
     @property
     def player_response(self) -> Response:
@@ -156,6 +149,9 @@ class NBAPlayer(Player):
         )
 
         return career_totals
+
+    # def accolades(self):
+    #     return {accolade.text.strip() for accolade in self.player_soup.find('ul', {'id': 'bling'}) if accolade.text.strip()}
 
     def __repr__(self):
         return f"<{self.full_name}>"

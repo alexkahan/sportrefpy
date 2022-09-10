@@ -27,6 +27,11 @@ class MLB(Sport):
         else:
             self.current_season_year = datetime.today().year - 1
 
+    def get_season(self, season):
+        if not season:
+            return self.current_season_year
+        return season
+
     @staticmethod
     def players():
         return AllPlayers.mlb_players()
@@ -35,9 +40,7 @@ class MLB(Sport):
         """
         Season will be current year if it's not specified. Overall standings.
         """
-
-        if season is None:
-            season = self.current_season_year
+        season = self.get_season(season)
 
         page = requests.get(f"{self.url}/leagues/majors/{str(season)}-standings.shtml")
         soup = BeautifulSoup(page.text, "html.parser")
@@ -61,8 +64,7 @@ class MLB(Sport):
 
     def al_standings(self, season=None):
 
-        if season is None:
-            season = self.current_season_year
+        season = self.get_season(season)
 
         page = requests.get(f"{self.url}/leagues/AL/{str(season)}-standings.shtml").text
         soup = BeautifulSoup(page, "html.parser")
@@ -86,8 +88,7 @@ class MLB(Sport):
 
     def nl_standings(self, season=None):
 
-        if season is None:
-            season = self.current_season_year
+        season = self.get_season(season)
 
         page = requests.get(f"{self.url}/leagues/NL/{str(season)}-standings.shtml").text
         soup = BeautifulSoup(page, "html.parser")
@@ -108,3 +109,7 @@ class MLB(Sport):
         standings.index = standings.index + 1
 
         return standings
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        raise NotImplementedError
