@@ -5,6 +5,7 @@ from typing import Dict
 from typing import Union
 
 import pandas as pd
+from numpy import ndarray
 from pandas import DataFrame
 from pandas import Series
 
@@ -22,6 +23,10 @@ class Formatter(ABC):
     @staticmethod
     def clean_player_name(player: str):
         return player.split("(")[0].strip("+* ")
+
+    @staticmethod
+    def clean_index_year(year: Union[int, float]):
+        return str(year).split("(")[0].strip("+* ")
 
     @staticmethod
     def date(number: int):
@@ -55,3 +60,20 @@ class PandasFormatter(Formatter):
             return data
         if isinstance(data, dict):
             return pd.DataFrame(data)
+
+
+class ColumnFormatter(Formatter):
+    @staticmethod
+    def output(columns: Union[pd.MultiIndex, ndarray]):
+        if type(columns) is pd.MultiIndex:
+            return [
+                " ".join([header, stat]) if "Unnamed" not in header else stat
+                for header, stat in columns.values
+            ]
+        if type(ndarray):
+            if type(columns[0]) is str:
+                return columns
+            return [
+                " ".join([header, stat]) if "Unnamed" not in header else stat
+                for header, stat in columns
+            ]

@@ -47,10 +47,6 @@ class Player(ABC):
     def player_url(self):
         return self.players[self.name]
 
-    @property
-    def is_valid_player(self):
-        raise NotImplementedError
-
     @classmethod
     def compare(cls, players: List[str], **kwargs):
         raise NotImplementedError
