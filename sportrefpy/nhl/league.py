@@ -49,8 +49,6 @@ class NHL(Sport):
             return Formatter.convert(east_conf, self.fmt)
         elif conf == "west":
             return Formatter.convert(west_conf, self.fmt)
-        return Formatter.convert(east_conf, self.fmt), Formatter.convert(west_conf, self.fmt)
-
-    @staticmethod
-    def box_score(day, month, year, home_team):
-        raise NotImplementedError
+        return Formatter.convert(east_conf, self.fmt), Formatter.convert(
+            west_conf, self.fmt
+        )
