@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from sportrefpy.nba.league import NBA
 from sportrefpy.team.team import Team
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class NBATeam(Team):
@@ -96,11 +97,11 @@ class NBATeam(Team):
 
         if player is not None:
             try:
-                return players.loc[player]
+                return Formatter.convert(players.loc[player], self.fmt)
             except KeyError:
                 return "Player not found."
 
-        return players
+        return Formatter.convert(players, self.fmt)
 
     def coaches_all_time_data(self, coach=None):
         """
@@ -135,11 +136,11 @@ class NBATeam(Team):
 
         if coach is not None:
             try:
-                return coaches.loc[coach]
+                return Formatter.convert(coaches.loc[coach], self.fmt)
             except KeyError:
                 return "Coach not found."
 
-        return coaches
+        return Formatter.convert(coaches, self.fmt)
 
     def roster(self, season=None):
         """
@@ -150,7 +151,9 @@ class NBATeam(Team):
             soup = BeautifulSoup(response.text, features="lxml")
             for i in soup.find_all("th", attrs={"class": "left"}):
                 if str(season) in i.find("a")["href"]:
-                    roster = pd.read_html(self.url + i.find("a")["href"])[0]
+                    roster = pd.read_html(
+                        f"{SportURLs.NBA.value}{i.find('a')['href']}"
+                    )[0]
                     break
             roster.drop(columns={"Unnamed: 6"}, inplace=True)
             roster["Exp"] = roster["Exp"].replace("R", 0)
@@ -158,9 +161,9 @@ class NBATeam(Team):
             roster.set_index("Player", inplace=True)
             roster["Exp"] = roster["Exp"].apply(lambda x: int(x))
             roster["Birth Date"] = roster["Birth Date"].apply(
-                lambda x: pd.to_datetime(x)
+                lambda x: pd.to_datetime(x, format="%B %d, %Y").strftime("%m-%d-%Y")
             )
-            return roster
+            return Formatter.convert(roster, self.fmt)
         else:
             return None
 
@@ -175,13 +178,13 @@ class NBATeam(Team):
         seasons["Team"] = seasons["Team"].apply(lambda x: x.split("*")[0])
         seasons.drop(columns={"Unnamed: 8", "Unnamed: 15"}, inplace=True)
 
-        if year is not None:
+        if year:
             try:
-                return seasons.loc[year]
+                return Formatter.convert(seasons.loc[year], self.fmt)
             except KeyError:
                 return "Season not found."
 
-        return seasons
+        return Formatter.convert(seasons, self.fmt)
 
     def __repr__(self):
         return f"<{self.abbreviation} - {self.franchise_name}>"
