@@ -7,6 +7,7 @@ from sportrefpy.sport.sport import Sport
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class NHL(Sport):
@@ -45,10 +46,10 @@ class NHL(Sport):
         west_conf.index = west_conf.index + 1
 
         if conf == "east":
-            return east_conf
+            return Formatter.convert(east_conf, self.fmt)
         elif conf == "west":
-            return west_conf
-        return east_conf, west_conf
+            return Formatter.convert(west_conf, self.fmt)
+        return Formatter.convert(east_conf, self.fmt), Formatter.convert(west_conf, self.fmt)
 
     @staticmethod
     def box_score(day, month, year, home_team):

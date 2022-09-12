@@ -134,7 +134,7 @@ class NBATeam(Team):
         coaches.set_index("Coach", inplace=True)
         coaches = coaches.apply(pd.to_numeric)
 
-        if coach is not None:
+        if coach:
             try:
                 return Formatter.convert(coaches.loc[coach], self.fmt)
             except KeyError:
@@ -187,4 +187,4 @@ class NBATeam(Team):
         return Formatter.convert(seasons, self.fmt)
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise_name}>"
+        return f"<{self.abbreviation} - {self.team}>"

@@ -10,6 +10,7 @@ from sportrefpy.util.enums import BoxScoreURLs
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class NFL(Sport):
@@ -35,7 +36,7 @@ class NFL(Sport):
         """
         Season will be current year if it's not specified.
         """
-        if season is None:
+        if not season:
             season = self.current_season_year
 
         # AFC
@@ -63,10 +64,10 @@ class NFL(Sport):
         nfc.index = nfc.index + 1
 
         if conf == "AFC":
-            return afc
+            return Formatter.convert(afc, self.fmt)
         elif conf == "NFC":
-            return nfc
-        return afc, nfc
+            return Formatter.convert(nfc, self.fmt)
+        return Formatter.convert(afc, self.fmt), Formatter.convert(nfc, self.fmt)
 
     def season_leaders(self, year=None):
         if year is None:
@@ -93,12 +94,8 @@ class NFL(Sport):
         season_leaders = pd.DataFrame(stats_leaders)
         season_leaders.set_index("Year", inplace=True)
 
-        return season_leaders
+        return Formatter.convert(season_leaders, self.fmt)
 
     @staticmethod
     def box_score(day, month, year, home_team):
-        page = requests.get(
-            f"{BoxScoreURLs.NFL.value}{year}{month}{day}0{home_team}.htm"
-        ).text
-        soup = BeautifulSoup(page, "lxml")
-        print("hi")
+        raise NotImplementedError

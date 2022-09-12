@@ -10,6 +10,7 @@ from sportrefpy.sport.sport import Sport
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
 class MLB(Sport):
@@ -60,7 +61,7 @@ class MLB(Sport):
         standings.drop(columns={"Rk"}, inplace=True)
         standings.index = standings.index + 1
 
-        return standings
+        return Formatter.convert(standings, self.fmt)
 
     def al_standings(self, season=None):
 
@@ -84,7 +85,7 @@ class MLB(Sport):
         standings.drop(columns={"Rk"}, inplace=True)
         standings.index = standings.index + 1
 
-        return standings
+        return Formatter.convert(standings, self.fmt)
 
     def nl_standings(self, season=None):
 
@@ -108,7 +109,7 @@ class MLB(Sport):
         standings.drop(columns={"Rk"}, inplace=True)
         standings.index = standings.index + 1
 
-        return standings
+        return Formatter.convert(standings, self.fmt)
 
     @staticmethod
     def box_score(day, month, year, home_team):

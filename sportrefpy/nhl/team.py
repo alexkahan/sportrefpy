@@ -4,6 +4,7 @@ import pandas as pd
 
 from sportrefpy.nhl.league import NHL
 from sportrefpy.team.team import Team
+from sportrefpy.util.formatter import Formatter
 
 
 class NHLTeam(Team):
@@ -86,13 +87,13 @@ class NHLTeam(Team):
         players.set_index("Player", inplace=True)
         players = players.apply(pd.to_numeric)
 
-        if player is not None:
+        if player:
             try:
-                return players.loc[player]
+                players = players.loc[player]
             except KeyError:
                 return "Player not found."
 
-        return players
+        return Formatter.convert(players, self.fmt)
 
     def goalies_all_time_stats(self, goalie=None):
         """
@@ -135,13 +136,13 @@ class NHLTeam(Team):
         goalies.set_index("Player", inplace=True)
         goalies = goalies.apply(pd.to_numeric)
 
-        if goalie is not None:
+        if goalie:
             try:
-                return goalies.loc[goalie]
+                goalies = goalies.loc[goalie]
             except KeyError:
                 return "Player not found."
 
-        return goalies
+        return Formatter.convert(goalies, self.fmt)
 
     def coaches_all_time_data(self, coach=None):
         """
@@ -180,7 +181,7 @@ class NHLTeam(Team):
             except KeyError:
                 return "Coach not found."
 
-        return coaches
+        return Formatter.convert(coaches, self.fmt)
 
     def roster(self, season=None):
         """
@@ -204,7 +205,7 @@ class NHLTeam(Team):
                 inplace=True,
             )
             roster.drop(columns={"Flag", "S/C", "Summary"}, inplace=True)
-            return roster
+            return Formatter.convert(roster, self.fmt)
         else:
             return None
 
@@ -218,13 +219,13 @@ class NHLTeam(Team):
         seasons.set_index("Season", inplace=True)
         seasons.drop(columns={"Lg", "Team"}, inplace=True)
 
-        if year is not None:
+        if year:
             try:
-                return seasons.loc[year]
+                seasons = seasons.loc[year]
             except KeyError:
                 return "Season not found."
 
-        return seasons
+        return Formatter.convert(seasons, self.fmt)
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise}>"
+        return f"<{self.abbreviation} - {self.team}>"

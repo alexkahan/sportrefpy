@@ -288,4 +288,4 @@ class NFLTeam(Team):
         return seasons
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise_name}>"
+        return f"<{self.abbreviation} - {self.team}>"
