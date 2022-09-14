@@ -6,14 +6,14 @@ from bs4 import BeautifulSoup
 from bs4 import Comment
 
 from sportrefpy.player.util.all_players import AllPlayers
-from sportrefpy.sport.sport import Sport
+from sportrefpy.league.league import League
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
 from sportrefpy.util.formatter import Formatter
 
 
-class MLB(Sport):
+class MLB(League):
     def __init__(self):
         super().__init__()
         self._name = SportEnum.MLB.value

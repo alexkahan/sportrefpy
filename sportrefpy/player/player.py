@@ -1,5 +1,4 @@
 from abc import ABC
-from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -45,7 +44,3 @@ class Player(ABC):
     @property
     def player_url(self):
         return self.players[self.name]
-
-    @classmethod
-    def compare(cls, players: List[str], **kwargs):
-        raise NotImplementedError

@@ -2,13 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 
 from sportrefpy.player.util.all_players import AllPlayers
-from sportrefpy.sport.sport import Sport
+from sportrefpy.league.league import League
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
 
 
-class CBB(Sport):
+class CBB(League):
     def __init__(self):
         super().__init__()
         self._name = SportEnum.CBB.value

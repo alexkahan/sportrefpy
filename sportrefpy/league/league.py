@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from requests import Response
 
 
-class Sport(ABC):
+class League(ABC):
     def __init__(self, fmt: str = "dict"):
         self._num_teams: int = 0
         self.url: str = ""

@@ -12,7 +12,7 @@ from sportrefpy.nba.league import NBA
 from sportrefpy.nba.player import NBAPlayer
 from sportrefpy.nba.team import NBATeam
 
-# Instantiate a sport, player, or team
+# Instantiate a league, player, or team
 nba = NBA()
 allen_iverson = NBAPlayer('Allen Iverson')
 sixers = NBATeam('PHI')

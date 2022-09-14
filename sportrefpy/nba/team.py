@@ -54,10 +54,6 @@ class NBATeam(Team):
         return comparison
 
     def players_all_time_stats(self, player=None):
-        """
-        Returns Pandas dataframe of all historical player data for that team.
-        """
-
         players = pd.read_html(self.players_url)[0]
         players.columns = [
             "Rank",
@@ -104,10 +100,6 @@ class NBATeam(Team):
         return Formatter.convert(players, self.fmt)
 
     def coaches_all_time_data(self, coach=None):
-        """
-        Returns Pandas dataframe of all historical coach data.
-        """
-
         coaches = pd.read_html(self.coaches_url)[0]
         coaches.columns = [
             "Rank",
@@ -143,9 +135,6 @@ class NBATeam(Team):
         return Formatter.convert(coaches, self.fmt)
 
     def roster(self, season=None):
-        """
-        Returns Pandas dataframe of roster for a given year.
-        """
         if season:
             response = requests.get(self.team_url)
             soup = BeautifulSoup(response.text, features="lxml")
@@ -168,10 +157,6 @@ class NBATeam(Team):
             return None
 
     def season_history(self, year=None):
-        """
-        Returns Pandas dataframe of seasons.
-        """
-
         seasons = pd.read_html(self.seasons_url)[0]
         seasons = seasons[seasons["Team"] != "Team"]
         seasons.set_index("Season", inplace=True)

@@ -6,15 +6,15 @@ from bs4 import BeautifulSoup
 
 from sportrefpy.nba.player import NBAPlayer
 from sportrefpy.player.util.all_players import AllPlayers
-from sportrefpy.sport.sport import Sport
-from sportrefpy.sport.util.box_score import NBABoxScore
+from sportrefpy.league.league import League
+from sportrefpy.league.util.box_score import NBABoxScore
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
 from sportrefpy.util.formatter import Formatter
 
 
-class NBA(Sport):
+class NBA(League):
     def __init__(self):
         super().__init__()
         self._name = SportEnum.NBA.value
@@ -67,4 +67,7 @@ class NBA(Sport):
 
     @staticmethod
     def box_score(day, month, year, home_team):
-        return NBABoxScore.exact_game(day, month, year, home_team)
+        raise NotImplementedError
+
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
