@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from sportrefpy.nba.player import NBAPlayer
 from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.league.league import League
-from sportrefpy.league.util.box_score import NBABoxScore
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs

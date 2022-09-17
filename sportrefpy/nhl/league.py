@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -52,3 +54,13 @@ class NHL(League):
         return Formatter.convert(east_conf, self.fmt), Formatter.convert(
             west_conf, self.fmt
         )
+
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
+
+    def compare_players(self, players: List[str], total="career"):
+        raise NotImplementedError
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        raise NotImplementedError

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 import pandas as pd
 import requests
@@ -6,7 +7,6 @@ from bs4 import BeautifulSoup
 
 from sportrefpy.player.util.all_players import AllPlayers
 from sportrefpy.league.league import League
-from sportrefpy.util.enums import BoxScoreURLs
 from sportrefpy.util.enums import NumTeams
 from sportrefpy.util.enums import SportEnum
 from sportrefpy.util.enums import SportURLs
@@ -98,4 +98,10 @@ class NFL(League):
 
     @staticmethod
     def box_score(day, month, year, home_team):
+        raise NotImplementedError
+
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
+
+    def compare_players(self, players: List[str], total="career"):
         raise NotImplementedError
