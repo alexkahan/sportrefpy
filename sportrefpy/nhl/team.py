@@ -1,18 +1,54 @@
-from sportrefpy.nhl.league import NHL
+from typing import List
+
 import pandas as pd
-import numpy as np
+
+from sportrefpy.nhl.league import NHL
+from sportrefpy.team.team import Team
+from sportrefpy.util.formatter import Formatter
 
 
-class NHLFranchise(NHL):
-    def __init__(self, franchise):
+class NHLTeam(Team):
+    def __init__(self, team):
         super().__init__()
-        self.franchise = franchise.upper()
-        self.abbreviation = self.teams[self.franchise]["abbrev"]
-        self.franchise_name = self.teams[self.franchise]["team_name"]
-        self.team_url = self.teams[franchise]["url"]
-        self.skaters_url = self.team_url.replace("history", "skaters")
-        self.goalies_url = self.team_url.replace("history", "goalies")
-        self.coaches_url = self.team_url.replace("history", "coaches")
+        nhl = NHL()
+        self._team = team.upper()
+        self._details = nhl.get_teams()[self._team]
+
+    @classmethod
+    def compare(cls, franchises):
+        franchises = [cls(franchise) for franchise in franchises]
+        comparison = pd.concat(
+            [franchise.season_history()[["W", "L"]].sum() for franchise in franchises],
+            axis=1,
+        )
+        comparison.columns = [franchise.team for franchise in franchises]
+        comparison = comparison.transpose()
+        comparison["W%"] = comparison["W"] / (comparison["W"] + comparison["L"])
+        return comparison
+
+    @property
+    def abbreviation(self):
+        return self._details["abbrev"]
+
+    @property
+    def team(self):
+        return self._details["team_name"]
+
+    @property
+    def team_url(self):
+        return self._details["url"]
+
+    @property
+    def skaters_url(self):
+        return self.team_url.replace("history", "skaters")
+
+    @property
+    def goalies_url(self):
+        return self.team_url.replace("history", "goalies")
+
+    @property
+    def coaches_url(self):
+        return self.team_url.replace("history", "coaches")
 
     def skaters_all_time_stats(self, player=None):
         """
@@ -51,13 +87,13 @@ class NHLFranchise(NHL):
         players.set_index("Player", inplace=True)
         players = players.apply(pd.to_numeric)
 
-        if player is not None:
+        if player:
             try:
-                return players.loc[player]
+                players = players.loc[player]
             except KeyError:
                 return "Player not found."
 
-        return players
+        return Formatter.convert(players, self.fmt)
 
     def goalies_all_time_stats(self, goalie=None):
         """
@@ -100,13 +136,13 @@ class NHLFranchise(NHL):
         goalies.set_index("Player", inplace=True)
         goalies = goalies.apply(pd.to_numeric)
 
-        if goalie is not None:
+        if goalie:
             try:
-                return goalies.loc[goalie]
+                goalies = goalies.loc[goalie]
             except KeyError:
                 return "Player not found."
 
-        return goalies
+        return Formatter.convert(goalies, self.fmt)
 
     def coaches_all_time_data(self, coach=None):
         """
@@ -145,7 +181,7 @@ class NHLFranchise(NHL):
             except KeyError:
                 return "Coach not found."
 
-        return coaches
+        return Formatter.convert(coaches, self.fmt)
 
     def roster(self, season=None):
         """
@@ -169,7 +205,7 @@ class NHLFranchise(NHL):
                 inplace=True,
             )
             roster.drop(columns={"Flag", "S/C", "Summary"}, inplace=True)
-            return roster
+            return Formatter.convert(roster, self.fmt)
         else:
             return None
 
@@ -183,13 +219,13 @@ class NHLFranchise(NHL):
         seasons.set_index("Season", inplace=True)
         seasons.drop(columns={"Lg", "Team"}, inplace=True)
 
-        if year is not None:
+        if year:
             try:
-                return seasons.loc[year]
+                seasons = seasons.loc[year]
             except KeyError:
                 return "Season not found."
 
-        return seasons
+        return Formatter.convert(seasons, self.fmt)
 
     def __repr__(self):
-        return f"<{self.abbreviation} - {self.franchise}>"
+        return f"<{self.abbreviation} - {self.team}>"

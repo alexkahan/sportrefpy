@@ -1,43 +1,36 @@
-import requests
-import os
-
-from bs4 import BeautifulSoup
 import pandas as pd
-import numpy as np
-import enchant
+import requests
+from bs4 import BeautifulSoup
+from requests import Response
 
-from sportrefpy.nhl.league import NHL
-from sportrefpy.errors.not_found import PlayerNotFound
+from sportrefpy.player.player import Player
+from sportrefpy.player.util.all_players import AllPlayers
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
-class NHLPlayer(NHL):
-    def __init__(self, player):
-        super().__init__()
-        player_dict = enchant.PyPWL(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nhl_players.txt"
-        )
-        first_letter = player.split()[-1][0].lower()
-        with open(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nhl_players.txt",
-            "r",
-        ) as player_dict:
-            if player in player_dict.read():
-                response = requests.get(self.url + f"/players/{first_letter}")
-                soup = BeautifulSoup(response.text, features="lxml")
-                for item in soup.find_all("p", attrs={"class": "nhl"}):
-                    if player in item.text.split(" (")[0]:
-                        self.player_url = self.url + item.find("a")["href"]
-                        self.full_name = player
-            else:
-                try:
-                    suggestion = player_dict.suggest(player)[0]
-                    message = f"""<{player}> not found. 
-Is it possible you meant {suggestion}?
-Player names are case-sensitive."""
-                except:
-                    message = f"""<{player}> not found.
-Player names are case-sensitive."""
-                raise PlayerNotFound(message)
+class NHLPlayer(Player):
+    def __init__(self, name):
+        super().__init__(name)
+        self.name = name
+        self.full_name: str = name
+        self.sport_url = SportURLs.NHL.value
+
+    @property
+    def identifying_letter(self):
+        return self.name.split()[-1][0].lower()
+
+    @property
+    def players(self) -> dict:
+        return AllPlayers.nhl_players()
+
+    @property
+    def player_response(self) -> Response:
+        return requests.get(self.player_url)
+
+    @property
+    def player_soup(self) -> BeautifulSoup:
+        return BeautifulSoup(self.player_response.text, features="lxml")
 
     def regular_season_stats(self):
         """
@@ -77,4 +70,4 @@ Player names are case-sensitive."""
         stats = stats[stats["Lg"] == "NHL"]
         stats.drop(columns={"Lg", "TOI", "ATOI"}, inplace=True)
 
-        return stats
+        return Formatter.convert(stats, self.fmt)

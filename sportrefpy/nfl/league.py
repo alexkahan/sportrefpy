@@ -1,42 +1,42 @@
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
 from datetime import datetime
+from typing import List
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+from sportrefpy.player.util.all_players import AllPlayers
+from sportrefpy.league.league import League
+from sportrefpy.util.enums import NumTeams
+from sportrefpy.util.enums import SportEnum
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
-class NFL:
+class NFL(League):
     def __init__(self):
-        self.url = "https://www.pro-football-reference.com"
-        self.teams = {}
+        super().__init__()
+        self._name = SportEnum.NFL.value
+        self._num_teams = NumTeams.NFL
+        self.url = SportURLs.NFL.value
+        self.response = requests.get(f"{self.url}/teams")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"data-stat": "team_name", "class": "left"}
+        self.teams = self.get_teams()
         if datetime.today().month >= 9:
             self.current_season_year = datetime.today().year
         else:
             self.current_season_year = datetime.today().year - 1
 
-        response = requests.get(self.url + "/teams")
-        soup = BeautifulSoup(response.text, features="lxml")
-
-        for item in soup.find_all(attrs={"data-stat": "team_name", "class": "left"})[
-            1:33
-        ]:
-            self.teams[item.find("a")["href"].split("/")[-2]] = {
-                "team_name": item.text,
-                "abbrev": item.find("a")["href"].split("/")[-2],
-                "url": self.url + item.find("a")["href"],
-            }
-
-    def franchise_codes(self):
-        """
-        Print list of team codes, which are used for getting a specific franchise.
-        """
-        for abbrev, team_name in self.teams.items():
-            print(f"{abbrev} ({team_name['team_name']})")
+    @staticmethod
+    def players():
+        return AllPlayers.nfl_players()
 
     def conference_standings(self, conf=None, season=None):
         """
         Season will be current year if it's not specified.
         """
-        if season is None:
+        if not season:
             season = self.current_season_year
 
         # AFC
@@ -64,10 +64,10 @@ class NFL:
         nfc.index = nfc.index + 1
 
         if conf == "AFC":
-            return afc
+            return Formatter.convert(afc, self.fmt)
         elif conf == "NFC":
-            return nfc
-        return afc, nfc
+            return Formatter.convert(nfc, self.fmt)
+        return Formatter.convert(afc, self.fmt), Formatter.convert(nfc, self.fmt)
 
     def season_leaders(self, year=None):
         if year is None:
@@ -94,4 +94,14 @@ class NFL:
         season_leaders = pd.DataFrame(stats_leaders)
         season_leaders.set_index("Year", inplace=True)
 
-        return season_leaders
+        return Formatter.convert(season_leaders, self.fmt)
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        raise NotImplementedError
+
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
+
+    def compare_players(self, players: List[str], total="career"):
+        raise NotImplementedError

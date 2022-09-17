@@ -1,227 +1,178 @@
-import requests
-import os
-
-from bs4 import BeautifulSoup, Comment
 import pandas as pd
-import numpy as np
-import enchant
+import requests
+from bs4 import BeautifulSoup
+from requests import Response
 
-from sportrefpy.nfl.league import NFL
-from sportrefpy.errors.not_found import PlayerNotFound
+from sportrefpy.player.player import Player
+from sportrefpy.player.util.all_players import AllPlayers
+from sportrefpy.player.util.table_parser import TableParser
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import ColumnFormatter
+from sportrefpy.util.formatter import Formatter
 
 
-class NFLPlayer(NFL):
-    def __init__(self, player):
-        super().__init__()
+class NFLPlayer(Player):
+    def __init__(self, name):
+        super().__init__(name)
+        self.name = name
+        self.full_name: str = name
+        self.sport_url = SportURLs.NFL.value
 
-        player_dict = enchant.PyPWL(
-            os.path.dirname(os.path.dirname(__file__)) + "\\assets\\nfl_players.txt"
+    @property
+    def identifying_letter(self):
+        return self.name.split()[1][0].upper()
+
+    @property
+    def players(self) -> dict:
+        return AllPlayers.nfl_players()
+
+    @property
+    def player_response(self) -> Response:
+        return requests.get(self.player_url)
+
+    @property
+    def player_soup(self) -> BeautifulSoup:
+        return BeautifulSoup(self.player_response.text, features="lxml")
+
+    def regular_season_offensive_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids, ["receiving_and_rushing", "rushing_and_receiving"]
         )
-        first_letter_last_name = player.split()[1][0].upper()
-        response = requests.get(self.url + f"/players/{first_letter_last_name}")
-        soup = BeautifulSoup(response.text, features="lxml")
-        players = soup.find("div", attrs={"id": "div_players"})
-        if player in players.text:
-            for choice in players:
-                if player in choice.text:
-                    self.full_name = player
-                    self.player_url = self.url + choice.find("a")["href"]
-                    # response = requests.get(self.player_url)
-                    # soup = BeautifulSoup(response.text, features='lxml')
-                    # self.pitcher = True if 'Pitcher' in \
-                    #     soup.find_all('p')[0].text else False
-                    # comments = soup.find_all(string=lambda text:isinstance(text, Comment))
-                    # tables = []
-                    # for comment in comments:
-                    #     if 'batting_postseason' in str(comment) or 'pitching_postseason' in str(comment):
-                    #         tables.append(str(comment))
-                    # if tables:
-                    #     self.playoffs = True
-                    # else:
-                    #     self.playoffs = False
+        if not attr_id:
+            return None
 
-        else:
-            try:
-                suggestion = player_dict.suggest(player)[0]
-                message = f"""<{player}> not found. 
-Is it possible you meant {suggestion}?
-Player names are case-sensitive."""
-            except:
-                message = f"""<{player}> not found.
-Player names are case-sensitive."""
-            raise PlayerNotFound(message)
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
 
-    # def regular_season_batting(self, season=None, stat=None):
-    #     '''
-    #     Returns a players regular seasons batting stats by career.
-    #     '''
-    #     if not self.pitcher:
-    #         batting = pd.read_html(self.player_url, attrs={'id': 'batting_standard'})[0]
-    #         batting.dropna(how='any', axis='rows', subset='Year', inplace=True)
-    #         batting = batting[~batting['Year'].str.contains('Yrs|yrs|yr|Avg')]
-    #         batting = batting[batting['Lg'].str.contains('NL|AL|MLB')]
-    #         batting = batting.apply(pd.to_numeric, errors='ignore')
-    #         batting.set_index('Year', inplace=True)
-    #     elif self.pitcher:
-    #         response = requests.get(self.player_url)
-    #         soup = BeautifulSoup(response.text, features='lxml')
-    #         comments = soup.find_all(string=lambda text:isinstance(text, Comment))
-    #         tables = []
-    #         for comment in comments:
-    #             if 'batting_standard' in str(comment):
-    #                 try:
-    #                     tables.append(pd.read_html(str(comment)))
-    #                 except:
-    #                     continue
-    #         batting = tables[0][0]
-    #         batting.dropna(how='any', axis='rows', subset='Year', inplace=True)
-    #         batting = batting[~batting['Year'].str.contains('Yrs|yrs|yr|Avg')]
-    #         batting = batting[batting['Lg'].str.contains('NL|AL|MLB')]
-    #         batting = batting.apply(pd.to_numeric, errors='ignore')
-    #         batting.set_index('Year', inplace=True)
+        return Formatter.convert(df, self.fmt)
 
-    #     if season:
-    #         try:
-    #             return batting.loc[season]
-    #         except KeyError:
-    #             return None
-    #     return batting
+    def post_season_offensive_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["receiving_and_rushing_playoffs", "rushing_and_receiving_playoffs"],
+        )
+        if not attr_id:
+            return None
 
-    # def regular_season_pitching(self, season=None):
-    #     '''
-    #     Returns a players regular seasons pitching stats by career.
-    #     '''
-    #     if self.pitcher:
-    #         pitching = pd.read_html(self.player_url, attrs={'id': 'pitching_standard'})[0]
-    #         pitching.dropna(how='any', axis='rows', subset='Year', inplace=True)
-    #         pitching = pitching[~pitching['Year'].str.contains('Yrs|yrs|yr|Avg')]
-    #         pitching = pitching[pitching['Lg'].str.contains('NL|AL|MLB')]
-    #         pitching = pitching.apply(pd.to_numeric, errors='ignore')
-    #         pitching.set_index('Year', inplace=True)
-    #         if season:
-    #             try:
-    #                 return pitching.loc[season]
-    #             except KeyError:
-    #                 return None
-    #         return pitching
-    #     else:
-    #         return None
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
 
-    # def regular_season_fielding(self, season=None):
-    #     '''
-    #     Returns a players regular seasons fielding stats by career.
-    #     '''
-    #     response = requests.get(self.player_url)
-    #     soup = BeautifulSoup(response.text, features='lxml')
-    #     comments = soup.find_all(string=lambda text:isinstance(text, Comment))
-    #     tables = []
-    #     for comment in comments:
-    #         if 'standard_fielding' in str(comment):
-    #             try:
-    #                 tables.append(pd.read_html(str(comment)))
-    #             except:
-    #                 continue
-    #     fielding = tables[0][0]
-    #     fielding.dropna(how='any', axis='rows', subset='Year', inplace=True)
-    #     fielding = fielding[~fielding['Year'].str.contains('Seasons')]
-    #     fielding = fielding[fielding['Lg'].str.contains('NL|AL|MLB')]
-    #     fielding = fielding.apply(pd.to_numeric, errors='ignore')
-    #     fielding.set_index('Year', inplace=True)
-    #     if season:
-    #         try:
-    #             return fielding.loc[season]
-    #         except KeyError:
-    #             return None
-    #     return fielding
+        return Formatter.convert(df, self.fmt)
 
-    # def post_season_batting(self, season=None):
-    #     if not self.playoffs:
-    #         return None
-    #     response = requests.get(self.player_url)
-    #     soup = BeautifulSoup(response.text, features='lxml')
-    #     comments = soup.find_all(string=lambda text:isinstance(text, Comment))
-    #     tables = []
-    #     for comment in comments:
-    #         if 'batting_postseason' in str(comment):
-    #             try:
-    #                 tables.append(pd.read_html(str(comment)))
-    #             except:
-    #                 continue
-    #     batting = tables[0][0]
-    #     batting.dropna(how='any', axis='rows', subset='Year', inplace=True)
-    #     batting = batting[~batting['Year'].str.\
-    #         contains('ALWC|NLWC|ALDS|NLDS|ALCS|NLCS|WS')]
-    #     batting = batting[batting['Lg'].str.contains('NL|AL|MLB')]
-    #     batting = batting.apply(pd.to_numeric, errors='ignore')
-    #     batting.set_index('Year', inplace=True)
-    #     if season:
-    #         try:
-    #             return batting.loc[season]
-    #         except KeyError:
-    #             return None
-    #     return batting
+    def regular_season_passing_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["passing"],
+        )
+        if not attr_id:
+            return None
 
-    # def post_season_pitching(self, season=None):
-    #     if not self.pitcher:
-    #         return None
-    #     response = requests.get(self.player_url)
-    #     soup = BeautifulSoup(response.text, features='lxml')
-    #     comments = soup.find_all(string=lambda text:isinstance(text, Comment))
-    #     tables = []
-    #     for comment in comments:
-    #         if 'pitching_postseason' in str(comment):
-    #             try:
-    #                 tables.append(pd.read_html(str(comment)))
-    #             except:
-    #                 continue
-    #     pitching = tables[0][0]
-    #     pitching.dropna(how='any', axis='rows', subset='Year', inplace=True)
-    #     pitching = pitching[~pitching['Year'].str.\
-    #         contains('ALWC|NLWC|ALDS|NLDS|ALCS|NLCS|WS')]
-    #     pitching = pitching[pitching['Lg'].str.contains('NL|AL|MLB')]
-    #     pitching = pitching.apply(pd.to_numeric, errors='ignore')
-    #     pitching.set_index('Year', inplace=True)
-    #     if season:
-    #         try:
-    #             return pitching.loc[season]
-    #         except KeyError:
-    #             return None
-    #     return pitching
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
 
-    # def career_totals_pitching(self, stat=None):
-    #     if self.pitcher:
-    #         reg = pd.read_html(self.player_url, attrs={'id': 'pitching_standard'})[0]
-    #         reg = reg[reg['Year'].str.contains('Yrs', na=False)]
-    #         reg = reg.apply(pd.to_numeric, errors='ignore')
-    #         reg.reset_index(drop=True, inplace=True)
-    #         reg.drop(columns={'Year', 'Age', 'Tm', 'Lg', 'Awards'},
-    #                     inplace=True)
+        return Formatter.convert(df, self.fmt)
 
-    #         response = requests.get(self.player_url)
-    #         soup = BeautifulSoup(response.text, features='lxml')
-    #         comments = soup.find_all(string=lambda text:isinstance(text, Comment))
-    #         tables = []
-    #         for comment in comments:
-    #             if 'pitching_postseason' in str(comment):
-    #                 try:
-    #                     tables.append(pd.read_html(str(comment)))
-    #                 except:
-    #                     continue
-    #         post = tables[0][0]
-    #         post = post[post['Year'].str.contains('Yrs', na=False)]
-    #         post = post.apply(pd.to_numeric, errors='ignore')
-    #         post.drop(columns={'Year', 'Age', 'Tm', 'Lg'},
-    #                     inplace=True)
-    #         career = reg.merge(post, how='outer')
-    #         career.drop(columns={'Series', 'Rslt', 'Opp', 'WPA', 'cWPA'}, inplace=True)
-    #         career = pd.DataFrame(career.sum())
-    #         career.columns = ['Totals']
+    def post_season_passing_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["passing_playoffs"],
+        )
+        if not attr_id:
+            return None
 
-    #         if stat:
-    #             try:
-    #                 return career.loc[stat]
-    #             except KeyError:
-    #                 return None
-    #         return career
-    #     else:
-    #         return None
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
+
+        return Formatter.convert(df, self.fmt)
+
+    def regular_season_return_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["returns"],
+        )
+        if not attr_id:
+            return None
+
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
+
+        return Formatter.convert(df, self.fmt)
+
+    def post_season_return_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["returns_playoffs"],
+        )
+        if not attr_id:
+            return None
+
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
+
+        return Formatter.convert(df, self.fmt)
+
+    def regular_season_scoring_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["scoring"],
+        )
+        if not attr_id:
+            return None
+
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
+
+        return Formatter.convert(df, self.fmt)
+
+    def post_season_scoring_stats(self):
+        table_ids = TableParser.parse_table_ids(self.player_soup, "stats_table")
+        attr_id = TableParser.parse_attr_id(
+            table_ids,
+            ["scoring_playoffs"],
+        )
+        if not attr_id:
+            return None
+
+        df = pd.read_html(self.player_url, attrs={"id": attr_id})[0]
+        df.columns = ColumnFormatter.output(df.columns.values)
+        df["Year"] = df["Year"].apply(Formatter.clean_index_year)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        df = df[~df["Year"].str.contains("season|Career|yr|yrs|nan")]
+        df.set_index("Year", inplace=True)
+
+        return Formatter.convert(df, self.fmt)

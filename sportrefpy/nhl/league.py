@@ -1,30 +1,32 @@
+from typing import List
+
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
+
+from sportrefpy.player.util.all_players import AllPlayers
+from sportrefpy.league.league import League
+from sportrefpy.util.enums import NumTeams
+from sportrefpy.util.enums import SportEnum
+from sportrefpy.util.enums import SportURLs
+from sportrefpy.util.formatter import Formatter
 
 
-class NHL:
+class NHL(League):
     def __init__(self):
-        self.url = "https://www.hockey-reference.com"
-        self.teams = {}
-        self.standings_url = self.url + "/boxscores/"
+        super().__init__()
+        self._name = SportEnum.NHL.value
+        self._num_teams = NumTeams.NHL
+        self.url = SportURLs.NHL.value
+        self.standings_url = f"{self.url}/boxscores/"
+        self.response = requests.get(f"{self.url}/teams")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"data-stat": "franch_name"}
+        self.teams = self.get_teams()
 
-        response = requests.get(self.url + "/teams")
-        soup = BeautifulSoup(response.text, features="lxml")
-
-        for item in soup.find_all(attrs={"data-stat": "franch_name"})[1:33]:
-            self.teams[item.find("a")["href"].split("/")[-2]] = {
-                "team_name": item.text,
-                "abbrev": item.find("a")["href"].split("/")[-2],
-                "url": self.url + item.find("a")["href"],
-            }
-
-    def franchise_codes(self):
-        """
-        Print list of team codes, which are used for getting a specific franchise.
-        """
-        for abbrev, team_name in self.teams.items():
-            print(f"{abbrev} ({team_name['team_name']})")
+    @staticmethod
+    def players():
+        return AllPlayers.nhl_players()
 
     def conference_standings(self, conf=None):
         # Eastern Conference
@@ -46,7 +48,19 @@ class NHL:
         west_conf.index = west_conf.index + 1
 
         if conf == "east":
-            return east_conf
+            return Formatter.convert(east_conf, self.fmt)
         elif conf == "west":
-            return west_conf
-        return east_conf, west_conf
+            return Formatter.convert(west_conf, self.fmt)
+        return Formatter.convert(east_conf, self.fmt), Formatter.convert(
+            west_conf, self.fmt
+        )
+
+    def compare_franchises(self, franchises: List[str]):
+        raise NotImplementedError
+
+    def compare_players(self, players: List[str], total="career"):
+        raise NotImplementedError
+
+    @staticmethod
+    def box_score(day, month, year, home_team):
+        raise NotImplementedError

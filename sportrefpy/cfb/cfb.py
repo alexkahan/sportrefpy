@@ -1,36 +1,43 @@
 import requests
 from bs4 import BeautifulSoup
 
+from sportrefpy.league.league import League
+from sportrefpy.util.enums import NumTeams
+from sportrefpy.util.enums import SportEnum
+from sportrefpy.util.enums import SportURLs
 
-class CFB:
+
+class CFB(League):
     def __init__(self):
-        self.url = "https://www.sports-reference.com/cfb"
-        self.schools = {}
+        super().__init__()
+        self._name = SportEnum.CFB.value
+        self._num_teams = NumTeams.CFB
+        self.url = SportURLs.CFB.value
+        self.response = requests.get(f"{self.url}/schools")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"data-stat": "school_name"}
+        self.teams = self.get_teams()
 
-        response = requests.get(self.url + "/schools")
-        soup = BeautifulSoup(response.text, features="lxml")
-
-        for item in soup.find_all(attrs={"data-stat": "school_name"})[1:486]:
+    def get_teams(self):
+        teams = dict()
+        for item in self.soup.find_all(attrs={"data-stat": "school_name"})[
+            1 : self._num_teams + 1
+        ]:
             if item.find("a") is not None:
-                self.schools[item.find("a")["href"].split("/")[-2]] = {
+                teams[item.find("a")["href"].split("/")[-2]] = {
                     "team_name": item.text,
                     "url": "https://www.sports-reference.com" + item.find("a")["href"],
                 }
 
-    def school_codes(self):
-        """
-        Print list of team codes, which are used for getting a specific schools.
-        """
-        for abbrev, team_name in self.schools.items():
-            print(f"{abbrev} ({team_name['team_name']})")
+        return teams
 
 
 class CFBSchool(CFB):
     def __init__(self, school):
         super().__init__()
         self.abbreviation = school
-        self.school = self.schools[school]["team_name"]
-        self.school_url = self.schools[school]["url"]
+        self.school = self.teams[school]["team_name"]
+        self.school_url = self.teams[school]["url"]
 
     def __repr__(self):
         return f"<{self.abbreviation} - {self.school}>"

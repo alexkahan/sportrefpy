@@ -1,21 +1,39 @@
 import requests
 from bs4 import BeautifulSoup
 
+from sportrefpy.player.util.all_players import AllPlayers
+from sportrefpy.league.league import League
+from sportrefpy.util.enums import NumTeams
+from sportrefpy.util.enums import SportEnum
+from sportrefpy.util.enums import SportURLs
 
-class CBB:
+
+class CBB(League):
     def __init__(self):
-        self.url = "https://www.sports-reference.com/cbb"
-        self.schools = {}
+        super().__init__()
+        self._name = SportEnum.CBB.value
+        self._num_teams = NumTeams.CBB
+        self.url = SportURLs.CBB.value
+        self.response = requests.get(f"{self.url}/schools")
+        self.soup = BeautifulSoup(self.response.text, features="lxml")
+        self.soup_attrs = {"data-stat": "school_name"}
+        self.teams = self.get_teams()
 
-        response = requests.get(self.url + "/schools")
-        soup = BeautifulSoup(response.text, features="lxml")
+    def players(self):
+        return AllPlayers.cbb_players()
 
-        for item in soup.find_all(attrs={"data-stat": "school_name"})[1:510]:
+    def get_teams(self):
+        teams = dict()
+        for item in self.soup.find_all(attrs={"data-stat": "school_name"})[
+            1 : self._num_teams + 1
+        ]:
             if item.find("a") is not None:
-                self.schools[item.find("a")["href"].split("/")[-2]] = {
+                teams[item.find("a")["href"].split("/")[-2]] = {
                     "team_name": item.text,
                     "url": "https://www.sports-reference.com" + item.find("a")["href"],
                 }
+
+        return teams
 
     def school_codes(self):
         """

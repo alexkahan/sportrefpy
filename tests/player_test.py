@@ -1,28 +1,28 @@
-import pytest
 import numpy as np
+import pytest
 
-from sportrefpy.nba.team import NBAFranchise
-from sportrefpy.nba.player import NBAPlayer
-from sportrefpy.nba.analysis import compare_players
-from sportrefpy.nhl.team import NHLFranchise
-from sportrefpy.mlb.team import MLBFranchise
 from sportrefpy.mlb.player import MLBPlayer
+from sportrefpy.mlb.team import MLBTeam
+from sportrefpy.nba.analysis import compare_players
+from sportrefpy.nba.player import NBAPlayer
+from sportrefpy.nba.team import NBATeam
+from sportrefpy.nhl.team import NHLTeam
 
 
 def test_NBA_player_FGA():
-    sixers = NBAFranchise("PHI")
+    sixers = NBATeam("PHI")
     players = sixers.players_all_time_stats()
     assert players.loc["James Young", "FGA"] == 14.0
 
 
 def test_NBA_player_TRB():
-    warriors = NBAFranchise("GSW")
+    warriors = NBATeam("GSW")
     players = warriors.players_all_time_stats()
     assert players.loc["Wilt Chamberlain", "TRB"] == 10768.0
 
 
 def test_NBA_player():
-    clippers = NBAFranchise("LAC")
+    clippers = NBATeam("LAC")
     players = clippers.roster(2022)
     assert "Kawhi Leonard" in players.index
 
@@ -60,37 +60,37 @@ def test_NBA_player_comparison():
 
 
 def test_NHL_goalie():
-    bruins = NHLFranchise("BOS")
+    bruins = NHLTeam("BOS")
     goalies = bruins.goalies_all_time_stats()
     assert goalies.loc["Gerry Cheevers", "SV"] == 10579.0
 
 
 def test_NHL_skaters():
-    veg = NHLFranchise("VEG")
+    veg = NHLTeam("VEG")
     skaters = veg.skaters_all_time_stats()
     assert skaters.loc["Pierre-Edouard Bellemare", "PPG"] == 0.0
 
 
 def test_NHL_player():
-    panthers = NHLFranchise("FLA")
+    panthers = NHLTeam("FLA")
     players = panthers.roster(2021)
     assert "Aleksander Barkov" in players.index
 
 
 def test_NHL_seasons():
-    redwings = NHLFranchise("DET")
+    redwings = NHLTeam("DET")
     seasons = redwings.season_history("2012-13")
     assert seasons.loc["W"] == 24
 
 
 def test_MLB_batter():
-    sea = MLBFranchise("SEA")
+    sea = MLBTeam("SEA")
     batters = sea.batters_all_time_stats()
     assert batters.loc["Ken Griffey Jr.", "PA"] == 7250.0
 
 
 def test_MLB_pitcher():
-    bos = MLBFranchise("BOS")
+    bos = MLBTeam("BOS")
     pitchers = bos.pitchers_all_time_stats()
     assert pitchers.loc["Dennis Eckersley", "To"] == 1998
 
